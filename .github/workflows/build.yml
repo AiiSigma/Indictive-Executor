@@ -31,10 +31,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.32.0'
-
-      - name: Install Android SDK 36
-        run: sdkmanager --install "platforms;android-36"
 
       - name: Get dependencies
         run: flutter pub get

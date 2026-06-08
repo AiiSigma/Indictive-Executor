@@ -1,57 +1,45 @@
-name: Build Flutter APK
+name: Flutter Build APK
 
 on:
-  workflow_dispatch:
-    inputs:
-      triggered_by:
-        description: 'Triggered by (Telegram user ID)'
-        required: false
-        default: 'unknown'
+  workflow_dispatch:   # dipanggil oleh bot setelah upload
 
 jobs:
   build:
-    name: Build APK
+    name: Build Release APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: temurin
           java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
-          channel: 'stable'
+          channel: stable
           cache: true
 
-      - name: Get Flutter Dependencies
+      - name: Flutter pub get
         run: flutter pub get
 
-      - name: Build APK (Release)
+      - name: Build APK release
         run: flutter build apk --release --no-tree-shake-icons
 
-      - name: Rename APK
+      - name: Rename & move APK
         run: |
-          BUILD_DATE=$(date +'%Y%m%d-%H%M')
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/IndictiveCore-${BUILD_DATE}.apk
-          echo "APK_NAME=IndictiveCore-${BUILD_DATE}.apk" >> $GITHUB_ENV
+          mkdir -p output
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             output/app-release-$(date +'%Y%m%d-%H%M').apk
 
-      - name: Upload APK as Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APK_NAME }}
-          path: build/app/outputs/flutter-apk/${{ env.APK_NAME }}
-          retention-days: 7
-
-      - name: Get APK Info
-        run: |
-          APK_PATH="build/app/outputs/flutter-apk/${{ env.APK_NAME }}"
-          APK_SIZE=$(du -sh "$APK_PATH" | cut -f1)
-          echo "APK_SIZE=${APK_SIZE}" >> $GITHUB_ENV
-          echo "Build selesai: ${{ env.APK_NAME }} (${APK_SIZE})"
+          name: APK-Release-${{ github.run_number }}
+          path: output/*.apk
+          retention-days: 90

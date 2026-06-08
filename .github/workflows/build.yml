@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch project yang mau di-build (contoh: build/indictive-core)'
+        description: 'Branch project yang mau di-build (contoh: build/my-app)'
         required: false
         default: ''
 
@@ -17,7 +17,6 @@ jobs:
       - name: Determine branch
         id: vars
         run: |
-          # Kalau ada input branch, pakai itu. Kalau tidak, pakai branch yang trigger workflow
           TARGET="${{ github.event.inputs.branch }}"
           if [ -z "$TARGET" ]; then
             TARGET="${{ github.ref_name }}"
@@ -34,14 +33,31 @@ jobs:
         run: |
           echo "=== Isi folder ==="
           ls -la
+          echo ""
+          echo "=== Struktur folder ==="
+          find . -maxdepth 2 -type f | head -30
+          echo ""
+
           if [ ! -f "pubspec.yaml" ]; then
-            echo "❌ pubspec.yaml tidak ditemukan!"
+            echo "ERROR: pubspec.yaml tidak ditemukan di branch ini!"
             echo "Branch: ${{ steps.vars.outputs.branch }}"
+            echo ""
+            echo "Pastikan project Flutter sudah diupload ke branch ini."
             exit 1
           fi
-          echo "✅ pubspec.yaml ditemukan"
-          echo "=== pubspec.yaml ==="
-          cat pubspec.yaml
+
+          echo "pubspec.yaml ditemukan:"
+          head -20 pubspec.yaml
+          echo ""
+
+          if [ ! -d "android" ]; then
+            echo "ERROR: Folder android/ tidak ditemukan!"
+            echo "Build APK membutuhkan folder android/ di dalam project."
+            exit 1
+          fi
+
+          echo "android/ folder ditemukan"
+          echo "=== Verifikasi selesai, mulai build ==="
 
       - name: Setup Java 17
         uses: actions/setup-java@v4

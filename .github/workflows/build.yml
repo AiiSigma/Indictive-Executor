@@ -59,33 +59,201 @@ jobs:
           echo "android/ folder ditemukan"
           echo "=== Verifikasi selesai, mulai build ==="
 
+      # ╔══════════════════════════════════════════════════╗
+      # ║  AUTO-DETECT FLUTTER VERSION dari pubspec.yaml   ║
+      # ╚══════════════════════════════════════════════════╝
+      - name: Detect Flutter version from pubspec.yaml
+        id: flutter_ver
+        run: |
+          echo "=== Membaca SDK constraints dari pubspec.yaml ==="
+
+          # Ambil SDK constraint (contoh: ">=3.0.0 <4.0.0")
+          SDK_LINE=$(grep -E 'sdk:.*flutter' pubspec.yaml | head -1)
+          echo "SDK line: $SDK_LINE"
+
+          # Extract versi minimum SDK (contoh: 3.0.0 dari ">=3.0.0")
+          MIN_SDK=$(echo "$SDK_LINE" | grep -oP '\d+\.\d+\.\d+' | head -1)
+          echo "Min SDK version: $MIN_SDK"
+
+          # Extract versi maximum SDK jika ada
+          MAX_SDK=$(echo "$SDK_LINE" | grep -oP '<\s*\d+\.\d+\.\d+' | grep -oP '\d+\.\d+\.\d+' | head -1)
+          echo "Max SDK version: $MAX_SDK"
+
+          # Default: pakai stable terbaru
+          FLUTTER_VERSION=""
+          FLUTTER_CHANNEL="stable"
+
+          if [ -n "$MIN_SDK" ]; then
+            MAJOR=$(echo "$MIN_SDK" | cut -d. -f1)
+            MINOR=$(echo "$MIN_SDK" | cut -d. -f2)
+
+            echo "Major: $MAJOR, Minor: $MINOR"
+
+            # Mapping SDK constraint ke Flutter version yang kompatibel
+            if [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 24 ]; then
+              # SDK >= 3.24.x → Flutter 3.27.x (stable, aman)
+              FLUTTER_VERSION="3.27.4"
+            elif [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 22 ]; then
+              # SDK >= 3.22.x → Flutter 3.24.x
+              FLUTTER_VERSION="3.24.5"
+            elif [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 19 ]; then
+              # SDK >= 3.19.x → Flutter 3.22.x
+              FLUTTER_VERSION="3.22.3"
+            elif [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 16 ]; then
+              # SDK >= 3.16.x → Flutter 3.19.x
+              FLUTTER_VERSION="3.19.6"
+            elif [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 10 ]; then
+              # SDK >= 3.10.x → Flutter 3.16.x
+              FLUTTER_VERSION="3.16.9"
+            elif [ "$MAJOR" -ge 3 ]; then
+              # SDK >= 3.0.0 → Flutter 3.10.x
+              FLUTTER_VERSION="3.10.6"
+            elif [ "$MAJOR" -ge 2 ]; then
+              # SDK >= 2.x → Flutter 3.7.x
+              FLUTTER_VERSION="3.7.12"
+              FLUTTER_CHANNEL="stable"
+            fi
+
+            # Kalau ada max SDK constraint, pastikan Flutter version tidak melebihi
+            if [ -n "$MAX_SDK" ]; then
+              MAX_MAJOR=$(echo "$MAX_SDK" | cut -d. -f1)
+              MAX_MINOR=$(echo "$MAX_SDK" | cut -d. -f2)
+              FLUTTER_MAJOR=$(echo "$FLUTTER_VERSION" | cut -d. -f1)
+              FLUTTER_MINOR=$(echo "$FLUTTER_VERSION" | cut -d. -f2)
+
+              if [ "$FLUTTER_MAJOR" -gt "$MAX_MAJOR" ] || \
+                 { [ "$FLUTTER_MAJOR" -eq "$MAX_MAJOR" ] && [ "$FLUTTER_MINOR" -ge "$MAX_MINOR" ]; }; then
+                echo "⚠️ Flutter $FLUTTER_VERSION mungkin melebihi max SDK $MAX_SDK"
+                echo "Menurunkan ke Flutter versi yang aman..."
+                FLUTTER_VERSION="${MAX_MAJOR}.${MAX_MINOR}.0"
+              fi
+            fi
+          fi
+
+          # Fallback: kalau tetap kosong, pakai 3.27.4 (paling stabil & kompatibel luas)
+          if [ -z "$FLUTTER_VERSION" ]; then
+            FLUTTER_VERSION="3.27.4"
+            echo "⚠️ Tidak bisa detect versi, menggunakan default: $FLUTTER_VERSION"
+          fi
+
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+          echo ""
+          echo "✅ Flutter version terpilih: $FLUTTER_VERSION ($FLUTTER_CHANNEL)"
+
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Flutter
+      - name: Setup Flutter (auto-detected)
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: ${{ steps.flutter_ver.outputs.flutter_version }}
+          channel: ${{ steps.flutter_ver.outputs.flutter_channel || 'stable' }}
           cache: true
 
-      - name: Flutter pub get
-        run: flutter pub get
+      - name: Show Flutter info
+        run: |
+          echo "=== Flutter Version ==="
+          flutter --version
+          echo ""
+          echo "=== Dart Version ==="
+          dart --version
 
-      - name: Build APK release
+      # ╔══════════════════════════════════════════════════╗
+      # ║  AUTO-FIX: Resolve dependency conflicts         ║
+      # ╚══════════════════════════════════════════════════╝
+      - name: Auto-fix dependencies
+        run: |
+          echo "=== Step 1: flutter pub get ==="
+          flutter pub get 2>&1 || true
+
+          echo ""
+          echo "=== Step 2: Cek outdated packages ==="
+          flutter pub outdated --no-dev-dependencies 2>&1 || true
+
+          echo ""
+          echo "=== Step 3: flutter pub upgrade (auto-fix version conflict) ==="
+          # Ini yang PALING PENTING: auto-upgrade package yang incompatible
+          flutter pub upgrade --no-dev-dependencies 2>&1 || true
+
+          echo ""
+          echo "=== Step 4: dart fix --apply (auto-fix code breaking changes) ==="
+          # Fix kode yang outdated karena perubahan Flutter/Dart API
+          dart fix --apply 2>&1 || true
+
+          echo ""
+          echo "=== Step 5: flutter pub get (final resolve) ==="
+          flutter pub get 2>&1
+
+          echo ""
+          echo "✅ Auto-fix selesai!"
+
+      # ╔══════════════════════════════════════════════════╗
+      # ║  BUILD dengan auto-retry                       ║
+      # ╚══════════════════════════════════════════════════╝
+      - name: Build APK release (attempt 1)
+        id: build1
+        continue-on-error: true
         run: flutter build apk --release --no-tree-shake-icons
 
+      # Kalau build 1 gagal, coba dengan flag tambahan
+      - name: Build APK release (attempt 2 — extra flags)
+        id: build2
+        if: steps.build1.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          echo "⚠️ Build pertama gagal, coba ulang dengan flag tambahan..."
+          flutter clean
+          flutter pub get
+          flutter build apk --release --no-tree-shake-icons --dart-define=FLUTTER_WEB_USE_SKIA=false 2>&1
+
+      # Kalau build 2 juga gagal, coba tanpa --release flag
+      - name: Build APK release (attempt 3 — debug fallback)
+        id: build3
+        if: steps.build2.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          echo "⚠️ Build kedua gagal, coba build mode biasa..."
+          flutter clean
+          flutter pub get
+          flutter build apk --no-tree-shake-icons 2>&1
+
+      # Tentukan hasil build
+      - name: Check build result
+        id: result
+        run: |
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ Build APK berhasil!"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "❌ Build APK gagal setelah 3 percobaan"
+            echo ""
+            echo "=== Mencoba kumpulkan info error ==="
+            flutter build apk --release --no-tree-shake-icons --verbose 2>&1 | tail -50 || true
+          fi
+
       - name: Rename & move APK
+        if: steps.result.outputs.status == 'success'
         run: |
           mkdir -p output
           cp build/app/outputs/flutter-apk/app-release.apk \
              output/app-release-$(date +'%Y%m%d-%H%M').apk
 
       - name: Upload APK Artifact
+        if: steps.result.outputs.status == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: APK-Release-${{ github.run_number }}
           path: output/*.apk
           retention-days: 90
+
+      # Kalau gagal, exit dengan error code biar bot Telegram detect "failure"
+      - name: Fail workflow if build failed
+        if: steps.result.outputs.status == 'failed'
+        run: |
+          echo "❌ BUILD GAGAL — Workflow dihentikan dengan error"
+          exit 1

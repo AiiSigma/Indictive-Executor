@@ -7,26 +7,10 @@ on:
         description: 'Branch project yang mau di-build (contoh: build/my-app)'
         required: false
         default: ''
-      build_type:
-        description: 'Build type: release, profile, atau debug'
-        required: false
-        default: 'release'
-      flutter_version:
-        description: 'Flutter version (auto, atau versi spesifik seperti 3.24.5)'
-        required: false
-        default: 'auto'
-      run_analyzer:
-        description: 'Jalankan dart analyze sebelum build (true/false)'
-        required: false
-        default: 'true'
-      run_tests:
-        description: 'Jalankan flutter test sebelum build (true/false)'
-        required: false
-        default: 'true'
 
 jobs:
   build:
-    name: Build APK
+    name: Build Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -57,6 +41,8 @@ jobs:
           if [ ! -f "pubspec.yaml" ]; then
             echo "ERROR: pubspec.yaml tidak ditemukan di branch ini!"
             echo "Branch: ${{ steps.vars.outputs.branch }}"
+            echo ""
+            echo "Pastikan project Flutter sudah diupload ke branch ini."
             exit 1
           fi
 
@@ -66,6 +52,7 @@ jobs:
 
           if [ ! -d "android" ]; then
             echo "ERROR: Folder android/ tidak ditemukan!"
+            echo "Build APK membutuhkan folder android/ di dalam project."
             exit 1
           fi
 
@@ -79,130 +66,26 @@ jobs:
           java-version: '17'
 
       - name: Setup Flutter
-        id: flutter_setup
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-          flutter-version: ${{ github.event.inputs.flutter_version == 'auto' && '' || github.event.inputs.flutter_version }}
-
-      - name: Flutter version info
-        run: |
-          flutter --version
-          echo "Flutter SDK: $(flutter --version | head -1)"
 
       - name: Flutter pub get
         run: flutter pub get
 
-      # ── Dart Analyzer Step ──
-      - name: Run Dart Analyzer
-        id: analyzer
-        if: github.event.inputs.run_analyzer == 'true'
-        run: |
-          echo "🔍 Running dart analyze..."
-          flutter analyze --no-pub 2>&1 | tee analyze_output.txt
-
-          # Count results
-          ERRORS=$(grep -c "error" analyze_output.txt || true)
-          WARNINGS=$(grep -c "warning" analyze_output.txt || true)
-          HINTS=$(grep -c "hint" analyze_output.txt || true)
-          ISSUES=$(grep -c " • " analyze_output.txt || true)
-
-          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
-          echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
-          echo "hints=$HINTS" >> $GITHUB_OUTPUT
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
-
-          echo ""
-          echo "=== Analyzer Summary ==="
-          echo "Errors: $ERRORS"
-          echo "Warnings: $WARNINGS"
-          echo "Hints: $HINTS"
-          echo "Issues: $ISSUES"
-
-          # If there are errors, fail the build
-          if [ "$ERRORS" -gt 0 ]; then
-            echo ""
-            echo "❌ Dart analyzer found errors! Build stopped."
-            exit 1
-          fi
-
-          echo "✅ No errors found in analyzer"
-        continue-on-error: false
-
-      # ── Flutter Test Step ──
-      - name: Run Flutter Tests
-        id: tests
-        if: github.event.inputs.run_tests == 'true'
-        run: |
-          echo "🧪 Running flutter test..."
-
-          # Check if test directory exists
-          if [ ! -d "test" ]; then
-            echo "⚠️ No test/ directory found. Skipping tests."
-            echo "has_tests=false" >> $GITHUB_OUTPUT
-            echo "all_passed=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          flutter test --no-pub --reporter compact 2>&1 | tee test_output.txt
-
-          # Check results
-          if grep -q "Some tests failed" test_output.txt || grep -q "FAILED" test_output.txt; then
-            echo "❌ Some tests failed!"
-            echo "has_tests=true" >> $GITHUB_OUTPUT
-            echo "all_passed=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-
-          echo "has_tests=true" >> $GITHUB_OUTPUT
-          echo "all_passed=true" >> $GITHUB_OUTPUT
-          echo "✅ All tests passed!"
-        continue-on-error: false
-
-      # ── Build APK ──
-      - name: Build APK
-        id: build_apk
-        run: |
-          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
-
-          echo "Building APK with type: $BUILD_TYPE"
-
-          case "$BUILD_TYPE" in
-            release)
-              BUILD_CMD="flutter build apk --release --no-tree-shake-icons"
-              APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-              ;;
-            profile)
-              BUILD_CMD="flutter build apk --profile --no-tree-shake-icons"
-              APK_PATH="build/app/outputs/flutter-apk/app-profile.apk"
-              ;;
-            debug)
-              BUILD_CMD="flutter build apk --debug"
-              APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
-              ;;
-            *)
-              BUILD_CMD="flutter build apk --release --no-tree-shake-icons"
-              APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-              ;;
-          esac
-
-          echo "Build command: $BUILD_CMD"
-          $BUILD_CMD
-
-          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+      - name: Build APK release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Rename & move APK
         run: |
           mkdir -p output
-          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
-          APK_NAME="app-${BUILD_TYPE}-$(date +'%Y%m%d-%H%M').apk"
-          cp ${{ steps.build_apk.outputs.apk_path }} output/${APK_NAME}
-          echo "APK saved as: output/${APK_NAME}"
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             output/app-release-$(date +'%Y%m%d-%H%M').apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: APK-${{ github.event.inputs.build_type || 'release' }}-${{ github.run_number }}
+          name: APK-Release-${{ github.run_number }}
           path: output/*.apk
           retention-days: 90

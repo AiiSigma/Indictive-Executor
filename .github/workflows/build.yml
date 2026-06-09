@@ -7,6 +7,10 @@ on:
         description: 'Branch project yang mau di-build (contoh: build/my-app)'
         required: false
         default: ''
+      flutter_version:
+        description: 'Flutter version (kosongkan = latest stable, misal: 3.27.4)'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -31,13 +35,6 @@ jobs:
 
       - name: Verify project root
         run: |
-          echo "=== Isi folder ==="
-          ls -la
-          echo ""
-          echo "=== Struktur folder ==="
-          find . -maxdepth 2 -type f | head -30
-          echo ""
-
           if [ ! -f "pubspec.yaml" ]; then
             echo "ERROR: pubspec.yaml tidak ditemukan di branch ini!"
             echo "Branch: ${{ steps.vars.outputs.branch }}"
@@ -47,7 +44,7 @@ jobs:
           fi
 
           echo "pubspec.yaml ditemukan:"
-          head -20 pubspec.yaml
+          cat pubspec.yaml
           echo ""
 
           if [ ! -d "android" ]; then
@@ -57,7 +54,7 @@ jobs:
           fi
 
           echo "android/ folder ditemukan"
-          echo "=== Verifikasi selesai, mulai build ==="
+          echo "=== Verifikasi selesai ==="
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -70,26 +67,18 @@ jobs:
         with:
           channel: stable
           cache: true
+          flutter-version: ${{ github.event.inputs.flutter_version }}
 
       - name: Flutter pub get
         run: flutter pub get
 
-      # ▼▼▼ TAMBAHAN 1-STEP INI YANG BIKIN BEDA ▼▼▼
-      # Kenapa? Supaya package lama yang error (misal font_awesome_flutter)
-      # otomatis di-upgrade ke versi yang compatible sama Flutter terbaru.
-      # Tanpa step ini, pub get cuma pakai versi yang di-pubspec.yaml,
-      # kalau versinya lama → error IconData.
-      - name: Flutter pub upgrade (auto-fix package conflict)
-        run: flutter pub upgrade
-
       - name: Build APK release
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release
 
       - name: Rename & move APK
         run: |
           mkdir -p output
-          cp build/app/outputs/flutter-apk/app-release.apk \
-             output/app-release-$(date +'%Y%m%d-%H%M').apk
+          cp build/app/outputs/flutter-apk/app-release.apk output/app-release-$(date +'%Y%m%d-%H%M').apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

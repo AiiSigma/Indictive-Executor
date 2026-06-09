@@ -74,6 +74,14 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      # ▼▼▼ TAMBAHAN 1-STEP INI YANG BIKIN BEDA ▼▼▼
+      # Kenapa? Supaya package lama yang error (misal font_awesome_flutter)
+      # otomatis di-upgrade ke versi yang compatible sama Flutter terbaru.
+      # Tanpa step ini, pub get cuma pakai versi yang di-pubspec.yaml,
+      # kalau versinya lama → error IconData.
+      - name: Flutter pub upgrade (auto-fix package conflict)
+        run: flutter pub upgrade
+
       - name: Build APK release
         run: flutter build apk --release --no-tree-shake-icons
 

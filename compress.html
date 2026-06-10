@@ -9,53 +9,32 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#080c10;
-  --bg2:#0d1117;
-  --card:#111820;
-  --card2:#161d27;
-  --border:#1e2a38;
-  --border2:#2a3a4e;
-  --accent:#0ff0b3;
-  --accent2:#06c98e;
-  --accent-dim:rgba(15,240,179,0.08);
-  --accent-mid:rgba(15,240,179,0.15);
+  --bg:#080c10;--bg2:#0d1117;--card:#111820;--card2:#161d27;
+  --border:#1e2a38;--border2:#2a3a4e;
+  --accent:#0ff0b3;--accent2:#06c98e;
+  --accent-dim:rgba(15,240,179,0.08);--accent-mid:rgba(15,240,179,0.15);
   --accent-glow:rgba(15,240,179,0.3);
-  --danger:#ff4f6d;
-  --danger-dim:rgba(255,79,109,0.1);
-  --warn:#ffb347;
-  --warn-dim:rgba(255,179,71,0.1);
+  --danger:#ff4f6d;--danger-dim:rgba(255,79,109,0.1);
+  --warn:#ffb347;--warn-dim:rgba(255,179,71,0.1);
   --success:#0ff0b3;
-  --text:#e8edf3;
-  --text2:#8899aa;
-  --text3:#4a5e72;
-  --r:16px;
-  --r2:12px;
-  --r3:8px;
+  --text:#e8edf3;--text2:#8899aa;--text3:#4a5e72;
+  --r:16px;--r2:12px;--r3:8px;
   --font:'Space Grotesk',system-ui,sans-serif;
   --mono:'JetBrains Mono',monospace;
 }
 body{
-  font-family:var(--font);
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased;
 }
 body::before{
   content:'';position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 600px 400px at 20% 10%, rgba(15,240,179,0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 80%, rgba(6,201,142,0.03) 0%, transparent 70%);
+    radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);
   pointer-events:none;z-index:0;
 }
 .wrap{position:relative;z-index:1;padding:0 16px 140px;max-width:460px;margin:0 auto}
-
-.navbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 0 12px;border-bottom:1px solid var(--border);
-}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;border-bottom:1px solid var(--border)}
 .navbar-brand{display:flex;align-items:center;gap:10px}
 .navbar-logo{
   width:36px;height:36px;border-radius:10px;
@@ -71,7 +50,6 @@ body::before{
   background:var(--accent-dim);color:var(--accent);border:1px solid rgba(15,240,179,0.15);
   letter-spacing:0.3px;text-transform:uppercase;
 }
-
 .upload-area{
   margin-top:20px;position:relative;
   border:1.5px dashed var(--border2);border-radius:var(--r);
@@ -82,13 +60,12 @@ body::before{
 .upload-area.has-file{border-style:solid;border-color:var(--accent2);background:var(--card)}
 .upload-glow{
   position:absolute;inset:-1px;border-radius:var(--r);
-  background:radial-gradient(circle at 50% 50%, var(--accent-dim) 0%, transparent 70%);
+  background:radial-gradient(circle at 50% 50%,var(--accent-dim) 0%,transparent 70%);
   opacity:0;transition:opacity 0.4s;pointer-events:none;
 }
 .upload-area.has-file .upload-glow{opacity:1}
 .upload-icon{
-  width:52px;height:52px;margin:0 auto 14px;
-  border-radius:14px;background:var(--card2);
+  width:52px;height:52px;margin:0 auto 14px;border-radius:14px;background:var(--card2);
   display:flex;align-items:center;justify-content:center;
   transition:all 0.3s;position:relative;z-index:1;
 }
@@ -99,16 +76,12 @@ body::before{
 .upload-desc{font-size:12px;color:var(--text3);margin-top:4px;position:relative;z-index:1}
 .upload-change{font-size:11px;color:var(--accent);margin-top:8px;display:none;position:relative;z-index:1}
 .upload-area.has-file .upload-change{display:block}
-
 .file-card{
   display:none;margin-top:14px;
   background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
 }
 .file-card.show{display:block}
-.file-card-header{
-  display:flex;align-items:center;gap:10px;
-  padding:14px 16px;border-bottom:1px solid var(--border);
-}
+.file-card-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
 .file-card-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .file-card-dot.green{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
 .file-card-dot.yellow{background:var(--warn)}
@@ -116,10 +89,7 @@ body::before{
 .file-card-name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-card-size{font-family:var(--mono);font-size:11px;color:var(--text2)}
 .file-card-rows{padding:4px 16px}
-.file-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;
-}
+.file-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
 .file-row:last-child{border:none}
 .file-row-label{color:var(--text2);display:flex;align-items:center;gap:6px}
 .file-row-label svg{width:13px;height:13px;color:var(--text3)}
@@ -127,16 +97,12 @@ body::before{
 .file-row-val.c-accent{color:var(--accent)}
 .file-row-val.c-warn{color:var(--warn)}
 .file-row-val.c-danger{color:var(--danger)}
-
 .filter-section{
   display:none;margin-top:14px;
   background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
 }
 .filter-section.show{display:block}
-.filter-head{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px 16px;cursor:pointer;
-}
+.filter-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer}
 .filter-head-left{display:flex;align-items:center;gap:8px}
 .filter-head-left svg{width:15px;height:15px;color:var(--accent2)}
 .filter-head-left span{font-size:13px;font-weight:600}
@@ -153,63 +119,34 @@ body::before{
   cursor:pointer;transition:all 0.2s;user-select:none;font-family:var(--mono);
 }
 .filter-chip:active{transform:scale(0.95)}
-.filter-chip.on{
-  background:var(--accent-dim);color:var(--accent);
-  border-color:rgba(15,240,179,0.25);
-}
-
-.stats-row{
-  display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;
-}
+.filter-chip.on{background:var(--accent-dim);color:var(--accent);border-color:rgba(15,240,179,0.25)}
+.stats-row{display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
 .stats-row.show{display:grid}
-.stat-box{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
-  padding:12px 8px;text-align:center;
-}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px 8px;text-align:center}
 .stat-num{font-size:18px;font-weight:700;font-family:var(--mono)}
-.stat-num.cn{color:var(--accent)}
-.stat-num.cr{color:var(--danger)}
-.stat-num.cb{color:#5eaeff}
-.stat-num.co{color:var(--warn)}
+.stat-num.cn{color:var(--accent)}.stat-num.cr{color:var(--danger)}
+.stat-num.cb{color:#5eaeff}.stat-num.co{color:var(--warn)}
 .stat-lbl{font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
-
 .progress-box{
   display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:24px 20px;text-align:center;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center;
 }
 .progress-box.show{display:block}
 .progress-pct{font-size:36px;font-weight:700;color:var(--accent);font-family:var(--mono)}
-.progress-track{
-  width:100%;height:4px;background:var(--card2);border-radius:2px;
-  margin:16px 0 12px;overflow:hidden;
-}
-.progress-fill{
-  height:100%;width:0%;border-radius:2px;
-  background:linear-gradient(90deg,var(--accent2),var(--accent));
-  transition:width 0.3s ease;
-}
+.progress-track{width:100%;height:4px;background:var(--card2);border-radius:2px;margin:16px 0 12px;overflow:hidden}
+.progress-fill{height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 0.3s ease}
 .progress-label{font-size:11px;color:var(--text2);font-family:var(--mono)}
-
 .skip-log{
   display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:14px 16px;max-height:200px;overflow-y:auto;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;max-height:200px;overflow-y:auto;
 }
 .skip-log.show{display:block}
-.skip-log-head{
-  font-size:12px;font-weight:600;color:var(--warn);margin-bottom:10px;
-  display:flex;align-items:center;gap:6px;
-}
+.skip-log-head{font-size:12px;font-weight:600;color:var(--warn);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .skip-log-head svg{width:14px;height:14px}
-.skip-item{
-  display:flex;justify-content:space-between;gap:8px;
-  padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;
-}
+.skip-item{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px}
 .skip-item:last-child{border:none}
 .skip-path{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-family:var(--mono)}
 .skip-reason{color:var(--danger);flex-shrink:0;font-family:var(--mono)}
-
 .result-box{
   display:none;margin-top:14px;
   background:var(--card);border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);
@@ -221,17 +158,14 @@ body::before{
   background:radial-gradient(circle,rgba(15,240,179,0.06) 0%,transparent 70%);pointer-events:none;
 }
 .result-ring{
-  width:56px;height:56px;margin:0 auto 14px;
-  border-radius:50%;background:var(--accent-dim);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 24px var(--accent-glow);
+  width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-dim);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accent-glow);
 }
 .result-ring svg{width:26px;height:26px;color:var(--accent)}
 .result-h{font-size:17px;font-weight:700}
 .result-p{font-size:12px;color:var(--text2);margin-top:6px}
 .result-save{font-size:22px;font-weight:700;color:var(--accent);margin-top:10px;font-family:var(--mono)}
 .result-save.muted{color:var(--text3)}
-
 .act-btn{
   display:none;width:100%;margin-top:14px;padding:16px;
   border:none;border-radius:var(--r2);font-family:var(--font);
@@ -243,23 +177,13 @@ body::before{
 .act-btn:active{transform:scale(0.975)}
 .act-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 .act-btn svg{width:18px;height:18px;flex-shrink:0}
-.btn-go{
-  background:linear-gradient(135deg,var(--accent2),var(--accent));
-  color:#080c10;box-shadow:0 4px 20px var(--accent-glow);
-}
+.btn-go{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;box-shadow:0 4px 20px var(--accent-glow)}
 .btn-go:active{box-shadow:0 2px 10px var(--accent-glow)}
-.btn-share{
-  background:linear-gradient(135deg,#0a9d73,var(--accent2));
-  color:#fff;box-shadow:0 4px 20px rgba(15,240,179,0.2);
-}
+.btn-share{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(15,240,179,0.2)}
 .btn-share:active{box-shadow:0 2px 10px rgba(15,240,179,0.2)}
 .btn-share.busy{background:var(--card2);color:var(--text2);box-shadow:none}
 .btn-share.done{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff}
-
-.toast-wrap{
-  position:fixed;top:12px;left:12px;right:12px;z-index:1000;
-  display:flex;flex-direction:column;gap:6px;pointer-events:none;
-}
+.toast-wrap{position:fixed;top:12px;left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .toast{
   background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);
   padding:12px 14px;display:flex;align-items:center;gap:10px;
@@ -267,84 +191,68 @@ body::before{
   animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden;
 }
 .toast.out{animation:tOut 0.3s ease forwards}
-.toast-ic{
-  width:28px;height:28px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
+.toast-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .toast-ic svg{width:14px;height:14px}
-.toast-ic.ok{background:var(--accent-dim)} .toast-ic.ok svg{color:var(--accent)}
-.toast-ic.err{background:var(--danger-dim)} .toast-ic.err svg{color:var(--danger)}
-.toast-ic.inf{background:rgba(94,174,255,0.1)} .toast-ic.inf svg{color:#5eaeff}
-.toast-ic.wrn{background:var(--warn-dim)} .toast-ic.wrn svg{color:var(--warn)}
+.toast-ic.ok{background:var(--accent-dim)}.toast-ic.ok svg{color:var(--accent)}
+.toast-ic.err{background:var(--danger-dim)}.toast-ic.err svg{color:var(--danger)}
+.toast-ic.inf{background:rgba(94,174,255,0.1)}.toast-ic.inf svg{color:#5eaeff}
+.toast-ic.wrn{background:var(--warn-dim)}.toast-ic.wrn svg{color:var(--warn)}
 .toast-body{flex:1;min-width:0}
 .toast-t{font-size:12px;font-weight:600}
 .toast-m{font-size:10px;color:var(--text2);margin-top:1px}
-.toast-bar{
-  position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);
-  animation:tBar 3s linear forwards;
-}
-.toast-bar.ok{background:var(--accent)}
-.toast-bar.err{background:var(--danger)}
-.toast-bar.inf{background:#5eaeff}
-.toast-bar.wrn{background:var(--warn)}
+.toast-bar{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);animation:tBar 3s linear forwards}
+.toast-bar.ok{background:var(--accent)}.toast-bar.err{background:var(--danger)}
+.toast-bar.inf{background:#5eaeff}.toast-bar.wrn{background:var(--warn)}
 @keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes tOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-16px) scale(0.96)}}
 @keyframes tBar{from{width:100%}to{width:0%}}
-
-.share-overlay{
+.save-overlay{
   display:none;position:fixed;inset:0;
   background:rgba(8,12,16,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  z-index:500;align-items:center;justify-content:center;padding:32px;
+  z-index:500;align-items:center;justify-content:center;padding:24px;
 }
-.share-overlay.show{display:flex}
-.share-card{
+.save-overlay.show{display:flex}
+.save-card{
   background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:36px 24px;text-align:center;max-width:300px;width:100%;
+  padding:28px 20px;text-align:center;max-width:320px;width:100%;
   animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);
 }
-.share-spinner{width:44px;height:44px;margin:0 auto 16px;position:relative}
-.share-spinner::before{content:'';position:absolute;inset:0;border:3px solid var(--card2);border-radius:50%}
-.share-spinner::after{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+.save-spinner{width:44px;height:44px;margin:0 auto 14px;position:relative}
+.save-spinner::before{content:'';position:absolute;inset:0;border:3px solid var(--card2);border-radius:50%}
+.save-spinner::after{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.share-ok{
-  width:44px;height:44px;margin:0 auto 16px;
-  background:var(--accent-dim);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  animation:tIn 0.4s cubic-bezier(0.16,1,0.3,1);
+.save-ok{
+  width:48px;height:48px;margin:0 auto 14px;background:var(--accent-dim);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;animation:tIn 0.4s cubic-bezier(0.16,1,0.3,1);
 }
-.share-ok svg{width:22px;height:22px;color:var(--accent)}
-.share-ok.fail{background:var(--danger-dim)}
-.share-ok.fail svg{color:var(--danger)}
-.share-title{font-size:15px;font-weight:700}
-.share-sub{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
-.share-filename{
+.save-ok svg{width:24px;height:24px;color:var(--accent)}
+.save-ok.fail{background:var(--danger-dim)}.save-ok.fail svg{color:var(--danger)}
+.save-title{font-size:15px;font-weight:700}
+.save-sub{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
+.save-filename{
   font-family:var(--mono);font-size:11px;color:var(--accent);
   margin-top:10px;padding:6px 12px;background:var(--accent-dim);
   border-radius:6px;display:inline-block;word-break:break-all;
 }
-.share-close{
-  margin-top:18px;padding:9px 24px;
-  background:var(--card2);border:1px solid var(--border);border-radius:var(--r3);
-  color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);
-  transition:all 0.2s;
-}
-.share-close:active{background:var(--border);transform:scale(0.97)}
-.share-methods{
-  margin-top:14px;display:flex;flex-direction:column;gap:8px;
-}
-.share-method-btn{
-  padding:12px 16px;border:1px solid var(--border);border-radius:var(--r3);
+.save-methods{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.save-mbtn{
+  padding:13px 16px;border:1px solid var(--border);border-radius:var(--r3);
   background:var(--card2);color:var(--text);font-family:var(--font);
   font-size:12px;font-weight:600;cursor:pointer;display:flex;
   align-items:center;justify-content:center;gap:8px;transition:all 0.2s;
+  text-align:left;
 }
-.share-method-btn:active{transform:scale(0.97);background:var(--border)}
-.share-method-btn svg{width:16px;height:16px;flex-shrink:0}
-.share-method-btn.primary{
-  background:linear-gradient(135deg,var(--accent2),var(--accent));
-  color:#080c10;border-color:transparent;
+.save-mbtn:active{transform:scale(0.97);background:var(--border)}
+.save-mbtn svg{width:16px;height:16px;flex-shrink:0}
+.save-mbtn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;border-color:transparent}
+.save-mbtn.primary:active{background:var(--accent2)}
+.save-mbtn-desc{font-size:9px;font-weight:400;opacity:0.7;display:block;margin-top:2px}
+.save-close{
+  margin-top:14px;padding:9px 24px;
+  background:var(--card2);border:1px solid var(--border);border-radius:var(--r3);
+  color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.2s;
 }
-
+.save-close:active{background:var(--border);transform:scale(0.97)}
 .bottom-bar{
   position:fixed;bottom:0;left:0;right:0;
   background:var(--bg2);border-top:1px solid var(--border);
@@ -356,48 +264,34 @@ body::before{
 }
 .bottom-icon svg{width:13px;height:13px;color:var(--accent2)}
 .bottom-text{font-size:10px;color:var(--text2);line-height:1.5}
-
 #fileInput{display:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
-}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
 </style>
 </head>
 <body>
 
 <input type="file" id="fileInput" accept=".zip">
-
 <div class="toast-wrap" id="toastWrap"></div>
-
-<div class="share-overlay" id="shareOverlay">
-  <div class="share-card" id="shareCard"></div>
-</div>
+<div class="save-overlay" id="saveOverlay"><div class="save-card" id="saveCard"></div></div>
 
 <div class="wrap">
-
   <div class="navbar">
     <div class="navbar-brand">
       <div class="navbar-logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </div>
-      <div>
-        <div class="navbar-title">ZIP Compress</div>
-        <div class="navbar-sub">Flutter Build Bot</div>
-      </div>
+      <div><div class="navbar-title">ZIP Compress</div><div class="navbar-sub">Flutter Build Bot</div></div>
     </div>
-    <div class="navbar-badge">v2.0</div>
+    <div class="navbar-badge">v2.1</div>
   </div>
 
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
     <div class="upload-glow"></div>
     <div class="upload-icon" id="uploadIconBox">
-      <svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
+      <svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </div>
     <div class="upload-title" id="uploadTitle">Tap to Upload ZIP</div>
     <div class="upload-desc" id="uploadDesc">Pilih project Flutter untuk di-compress</div>
@@ -412,17 +306,11 @@ body::before{
     </div>
     <div class="file-card-rows">
       <div class="file-row">
-        <span class="file-row-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Original
-        </span>
+        <span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Original</span>
         <span class="file-row-val" id="rowOriginal">—</span>
       </div>
       <div class="file-row">
-        <span class="file-row-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Status
-        </span>
+        <span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Status</span>
         <span class="file-row-val" id="rowStatus">—</span>
       </div>
     </div>
@@ -475,22 +363,21 @@ body::before{
   </button>
 
   <button class="act-btn btn-share" id="btnShare" onclick="openSaveDialog()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    <span id="btnShareText">Share & Save File</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span id="btnShareText">Save File</span>
   </button>
-
 </div>
 
 <div class="bottom-bar">
   <div class="bottom-icon">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
   </div>
-  <div class="bottom-text">Upload ZIP &rarr; Compress &amp; buang file tidak penting &rarr; Share &amp; simpan ke lokasi yang diinginkan</div>
+  <div class="bottom-text">Upload ZIP &rarr; Compress &amp; bersihkan &rarr; Pilih metode simpan</div>
 </div>
 
 <script>
 /* ═══ CONFIG ═══ */
-var SKIP_PATTERNS = [
+var SKIP_PATTERNS=[
   {pattern:'.dart_tool/',desc:'.dart_tool/',active:true},
   {pattern:'.gradle/',desc:'.gradle/',active:true},
   {pattern:'.idea/',desc:'.idea/',active:true},
@@ -503,15 +390,17 @@ var SKIP_PATTERNS = [
   {pattern:'linux/flutter/generated_plugins/',desc:'linux/plugins/',active:true},
   {pattern:'.metadata',desc:'.metadata',active:true},
 ];
-var SKIP_EXT = ['.iml','.class'];
-var MAX_FILE = 50*1024*1024;
+var SKIP_EXT=['.iml','.class'];
+var MAX_FILE=50*1024*1024;
+var origZip=null,origSize=0,compBlob=null,compSize=0,compName='',analysis=null;
 
-var origZip=null, origSize=0, compBlob=null, compSize=0, compName='', analysis=null;
+/* ═══ Deteksi environment ═══ */
+var isTelegram=!!(window.Telegram&&window.Telegram.WebApp);
+var tgApp=isTelegram?window.Telegram.WebApp:null;
 
 /* ═══ TOAST ═══ */
 function toast(type,title,msg,dur){
-  dur=dur||3000;
-  var c=document.getElementById('toastWrap');
+  dur=dur||3000;var c=document.getElementById('toastWrap');
   var t=document.createElement('div');t.className='toast';
   var icons={
     ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
@@ -525,7 +414,7 @@ function toast(type,title,msg,dur){
 }
 
 /* ═══ INIT CHIPS ═══ */
-function initChips(){
+(function(){
   var body=document.getElementById('filterBody');
   SKIP_PATTERNS.forEach(function(p,i){
     var chip=document.createElement('div');
@@ -534,8 +423,7 @@ function initChips(){
     chip.onclick=function(e){e.stopPropagation();SKIP_PATTERNS[i].active=!SKIP_PATTERNS[i].active;chip.classList.toggle('on')};
     body.appendChild(chip);
   });
-}
-initChips();
+})();
 
 function toggleFilter(){
   var b=document.getElementById('filterBody'),btn=document.getElementById('filterToggle');
@@ -546,16 +434,12 @@ function toggleFilter(){
 document.getElementById('fileInput').addEventListener('change',async function(e){
   var file=e.target.files[0];if(!file)return;
   if(!file.name.endsWith('.zip')){toast('err','Invalid File','Hanya file .zip yang diperbolehkan');return}
-
   var area=document.getElementById('uploadArea');
   area.classList.add('has-file');
   document.getElementById('uploadTitle').textContent=file.name;
   document.getElementById('uploadDesc').textContent=fmtSize(file.size);
   document.getElementById('uploadChange').style.display='block';
-
-  document.getElementById('uploadSvg').outerHTML=
-    '<svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-
+  document.getElementById('uploadSvg').outerHTML='<svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
   var fc=document.getElementById('fileCard');fc.classList.add('show');
   document.getElementById('cardName').textContent=file.name;
   document.getElementById('cardSize').textContent=fmtSize(file.size);
@@ -563,103 +447,57 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
   document.getElementById('rowStatus').textContent='Analyzing...';
   document.getElementById('rowStatus').className='file-row-val c-warn';
   document.getElementById('statusDot').className='file-card-dot yellow';
-
   document.getElementById('filterSection').classList.add('show');
-
   origSize=file.size;
-  try{
-    origZip=await JSZip.loadAsync(file);
-    await analyzeZip();
-    toast('ok','File Loaded',file.name+' berhasil dibaca');
-  }catch(err){
-    document.getElementById('rowStatus').textContent='Error: '+err.message;
-    document.getElementById('rowStatus').className='file-row-val c-danger';
-    document.getElementById('statusDot').className='file-card-dot red';
-    toast('err','Read Error',err.message);
-  }
+  try{origZip=await JSZip.loadAsync(file);await analyzeZip();toast('ok','File Loaded',file.name+' berhasil dibaca')}
+  catch(err){document.getElementById('rowStatus').textContent='Error: '+err.message;document.getElementById('rowStatus').className='file-row-val c-danger';document.getElementById('statusDot').className='file-card-dot red';toast('err','Read Error',err.message)}
 });
 
 /* ═══ ANALYZE ═══ */
 async function analyzeZip(){
-  var entries=[];
-  origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
+  var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
   var kept=0,skipped=0,skippedFiles=[];
-  for(var i=0;i<entries.length;i++){
-    if(shouldSkip(entries[i].path)){skipped++;skippedFiles.push({path:entries[i].path,reason:skipReason(entries[i].path)})}
-    else{kept++}
-  }
+  for(var i=0;i<entries.length;i++){if(shouldSkip(entries[i].path)){skipped++;skippedFiles.push({path:entries[i].path,reason:skipReason(entries[i].path)})}else{kept++}}
   analysis={kept:kept,skipped:skipped,skippedFiles:skippedFiles,total:entries.length};
-
   var dot=document.getElementById('statusDot'),st=document.getElementById('rowStatus');
   if(origSize>20*1024*1024){st.textContent='Perlu compress (>20MB)';st.className='file-row-val c-danger';dot.className='file-card-dot red'}
   else if(origSize>15*1024*1024){st.textContent='Dianjurkan compress';st.className='file-row-val c-warn';dot.className='file-card-dot yellow'}
   else{st.textContent='Ukuran OK';st.className='file-row-val c-accent';dot.className='file-card-dot green'}
-
   document.getElementById('statsRow').classList.add('show');
-  document.getElementById('sKept').textContent=kept;
-  document.getElementById('sSkipped').textContent=skipped;
+  document.getElementById('sKept').textContent=kept;document.getElementById('sSkipped').textContent=skipped;
   document.getElementById('sOriginal').textContent=fmtSize(origSize);
-
   if(skippedFiles.length>0){
     var log=document.getElementById('skipLog');log.classList.add('show');
     var list=document.getElementById('skipList');list.innerHTML='';
     var show=skippedFiles.slice(0,50);
-    for(var j=0;j<show.length;j++){
-      var d=document.createElement('div');d.className='skip-item';
-      d.innerHTML='<span class="skip-path">'+show[j].path+'</span><span class="skip-reason">'+show[j].reason+'</span>';
-      list.appendChild(d);
-    }
-    if(skippedFiles.length>50){
-      var m=document.createElement('div');m.className='skip-item';
-      m.innerHTML='<span class="skip-path">...dan '+(skippedFiles.length-50)+' file lain</span>';
-      list.appendChild(m);
-    }
+    for(var j=0;j<show.length;j++){var d=document.createElement('div');d.className='skip-item';d.innerHTML='<span class="skip-path">'+show[j].path+'</span><span class="skip-reason">'+show[j].reason+'</span>';list.appendChild(d)}
+    if(skippedFiles.length>50){var m=document.createElement('div');m.className='skip-item';m.innerHTML='<span class="skip-path">...dan '+(skippedFiles.length-50)+' file lain</span>';list.appendChild(m)}
   }
-
-  if(skipped>0){document.getElementById('btnGo').classList.add('show')}
+  if(skipped>0)document.getElementById('btnGo').classList.add('show');
   else{st.textContent='Sudah bersih!';st.className='file-row-val c-accent';dot.className='file-card-dot green'}
 }
 
 /* ═══ SKIP LOGIC ═══ */
 function shouldSkip(p){
-  for(var i=0;i<SKIP_PATTERNS.length;i++){
-    var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;
-    if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return true}
-    else{if(p===pat||p.split('/').indexOf(pat)!==-1)return true}
-  }
-  var ext=p.substring(p.lastIndexOf('.'));
-  if(SKIP_EXT.indexOf(ext)!==-1)return true;
-  if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return true;
-  return false;
+  for(var i=0;i<SKIP_PATTERNS.length;i++){var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return true}else{if(p===pat||p.split('/').indexOf(pat)!==-1)return true}}
+  var ext=p.substring(p.lastIndexOf('.'));if(SKIP_EXT.indexOf(ext)!==-1)return true;if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return true;return false;
 }
 function skipReason(p){
-  for(var i=0;i<SKIP_PATTERNS.length;i++){
-    var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;
-    if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return s.desc}
-    else{if(p===pat||p.split('/').indexOf(pat)!==-1)return s.desc}
-  }
-  var ext=p.substring(p.lastIndexOf('.'));
-  if(SKIP_EXT.indexOf(ext)!==-1)return 'Ext '+ext;
-  if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return 'Lock file';
-  return 'Unknown';
+  for(var i=0;i<SKIP_PATTERNS.length;i++){var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return s.desc}else{if(p===pat||p.split('/').indexOf(pat)!==-1)return s.desc}}
+  var ext=p.substring(p.lastIndexOf('.'));if(SKIP_EXT.indexOf(ext)!==-1)return 'Ext '+ext;if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return 'Lock file';return 'Unknown';
 }
 
 /* ═══ COMPRESS ═══ */
 async function startCompress(){
   if(!origZip)return;
-  var btn=document.getElementById('btnGo');
-  btn.disabled=true;btn.querySelector('span').textContent='Compressing...';
+  var btn=document.getElementById('btnGo');btn.disabled=true;btn.querySelector('span').textContent='Compressing...';
   document.getElementById('progressBox').classList.add('show');
   toast('inf','Compressing','Memproses file, mohon tunggu...',4000);
-
   try{
-    var newZip=new JSZip();
-    var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
+    var newZip=new JSZip();var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
     var processed=0,total=entries.length,kept=0,skipped=0;
-
     for(var i=0;i<entries.length;i++){
-      var item=entries[i];
-      var pct=Math.round((processed/total)*100);
+      var item=entries[i];var pct=Math.round((processed/total)*100);
       setProgress(pct,'Processing: '+item.path.split('/').pop()+' ('+(processed+1)+'/'+total+')');
       if(shouldSkip(item.path)){skipped++;processed++;continue}
       var data=await item.entry.async('arraybuffer');
@@ -667,262 +505,217 @@ async function startCompress(){
       newZip.file(item.path,data);kept++;processed++;
       if(processed%10===0)await new Promise(function(r){setTimeout(r,0)});
     }
-
     setProgress(90,'Generating ZIP...');
-    compBlob=await newZip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){
-      setProgress(90+Math.round(m.percent/10),'Compressing data...');
-    });
-
-    compSize=compBlob.size;
-    var baseName=origZip.name||'project';
-    compName=baseName.replace(/\.zip$/i,'-clean.zip');
+    compBlob=await newZip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){setProgress(90+Math.round(m.percent/10),'Compressing data...')});
+    compSize=compBlob.size;var baseName=origZip.name||'project';compName=baseName.replace(/\.zip$/i,'-clean.zip');
     setProgress(100,'Selesai!');
-
     document.getElementById('sCompressed').textContent=fmtSize(compSize);
-
-    var saved=origSize-compSize;
-    var savedPct=Math.round((saved/origSize)*100);
+    var saved=origSize-compSize;var savedPct=Math.round((saved/origSize)*100);
     document.getElementById('resultBox').classList.add('show');
     document.getElementById('resultP').textContent=kept+' files kept, '+skipped+' files removed';
     var rs=document.getElementById('resultSave');
-    if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}
-    else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
-
+    if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
     var sb=document.getElementById('btnShare');sb.classList.add('show');
-    document.getElementById('btnShareText').textContent='Share & Save ('+fmtSize(compSize)+')';
-
+    document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
     btn.classList.remove('show');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';
-    toast('ok','Compress Berhasil','Tap "Share & Save" untuk menyimpan file');
-  }catch(err){
-    console.error(err);setProgress(0,'Error: '+err.message);
-    btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';
-    toast('err','Compression Failed',err.message,5000);
-  }
+    toast('ok','Compress Berhasil','Tap "Save File" untuk menyimpan');
+  }catch(err){console.error(err);setProgress(0,'Error');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';toast('err','Failed',err.message,5000)}
 }
 
-/* ═══════════════════════════════════════════════
-   SAVE DIALOG — 3 Metode Fallback
-   1. Web Share API (mobile / Telegram WebView)
-   2. File System Access API showSaveFilePicker (desktop Chrome)
-   3. Blob download fallback
-   ═══════════════════════════════════════════════ */
-
-/* Deteksi metode yang tersedia */
-function detectMethods(){
-  var methods = [];
-
-  /* Method 1: Web Share API dengan file support */
-  try {
-    var testFile = new File(['test'], 'test.zip', {type:'application/zip'});
-    if (navigator.canShare && navigator.canShare({files:[testFile]})) {
-      methods.push('share');
-    }
-  } catch(e){}
-
-  /* Method 2: File System Access API (showSaveFilePicker) — desktop Chrome */
-  if (window.showSaveFilePicker) {
-    methods.push('picker');
-  }
-
-  /* Method 3: Selalu ada — blob download */
-  methods.push('download');
-
-  return methods;
-}
-
-/* Buka dialog pilih metode simpan */
+/* ═══════════════════════════════════════════════════
+   SAVE DIALOG — Semua Metode
+   ═══════════════════════════════════════════════════ */
 function openSaveDialog(){
-  if(!compBlob){toast('err','Error','Tidak ada file yang siap di-share');return}
+  if(!compBlob){toast('err','Error','Tidak ada file');return}
+  showMethodPicker();
+}
 
-  var methods = detectMethods();
-  var overlay = document.getElementById('shareOverlay');
-  var card = document.getElementById('shareCard');
-
-  /* Kalau cuma ada 1 metode, langsung eksekusi tanpa dialog */
-  if(methods.length === 1){
-    if(methods[0]==='share') execShare();
-    else if(methods[0]==='picker') execPicker();
-    else execDownload();
-    return;
-  }
-
-  /* Tampilkan dialog pilihan metode */
+/* Tampilkan daftar semua metode simpan yang tersedia */
+function showMethodPicker(){
+  var overlay=document.getElementById('saveOverlay');
+  var card=document.getElementById('saveCard');
   overlay.classList.add('show');
 
-  var html = '<div class="share-title">Pilih Cara Menyimpan</div>';
-  html += '<div class="share-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>';
-  html += '<div class="share-methods">';
+  var h='<div class="save-title">Simpan File</div>';
+  h+='<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>';
+  h+='<div class="save-methods">';
 
-  if(methods.indexOf('share')!==-1){
-    html += '<button class="share-method-btn primary" onclick="execShare()">';
-    html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
-    html += 'Share / Save to Files</button>';
+  /* Metode 1: Web Share API — coba walau canShare false */
+  h+='<button class="save-mbtn primary" onclick="tryShare()">';
+  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+  h+='<span>Share & Save<span class="save-mbtn-desc">Buka share sheet → pilih Save to Files</span></span></button>';
+
+  /* Metode 2: Buka di Browser External — khusus Telegram */
+  if(isTelegram){
+    h+='<button class="save-mbtn primary" onclick="tryTelegramBrowser()">';
+    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+    h+='<span>Open in Browser<span class="save-mbtn-desc">Buka di Chrome → lalu tap Save File</span></span></button>';
   }
 
-  if(methods.indexOf('picker')!==-1){
-    html += '<button class="share-method-btn primary" onclick="execPicker()">';
-    html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
-    html += 'Pilih Lokasi Simpan</button>';
+  /* Metode 3: showSaveFilePicker — desktop Chrome */
+  if(window.showSaveFilePicker){
+    h+='<button class="save-mbtn" onclick="tryPicker()">';
+    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+    h+='<span>Pilih Lokasi Simpan<span class="save-mbtn-desc">Pilih folder tujuan (Chrome desktop)</span></span></button>';
   }
 
-  if(methods.indexOf('download')!==-1){
-    html += '<button class="share-method-btn" onclick="execDownload()">';
-    html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-    html += 'Download Langsung</button>';
-  }
+  /* Metode 4: Download langsung */
+  h+='<button class="save-mbtn" onclick="tryDownload()">';
+  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  h+='<span>Download Langsung<span class="save-mbtn-desc">Simpan ke folder Downloads</span></span></button>';
 
-  html += '</div>';
-  html += '<button class="share-close" onclick="closeShare()" style="margin-top:10px">Batal</button>';
-
-  card.innerHTML = html;
+  h+='</div>';
+  h+='<button class="save-close" onclick="closeSave()">Batal</button>';
+  card.innerHTML=h;
 }
 
-/* ═══ METHOD 1: Web Share API ═══ */
-async function execShare(){
-  var overlay=document.getElementById('shareOverlay');
-  var card=document.getElementById('shareCard');
+/* ═══ METODE 1: Web Share API ═══ */
+async function tryShare(){
+  var card=document.getElementById('saveCard');
   var btn=document.getElementById('btnShare');
-
   setBtnBusy(btn);
 
-  card.innerHTML='<div class="share-spinner"></div><div class="share-title">Membuka Share Sheet...</div><div class="share-sub">Pilih "Save to Files" / "Simpan ke File"<br>untuk menyimpan ke perangkat.</div>';
+  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Membuka Share Sheet...</div><div class="save-sub">Pilih "Save to Files" / "Simpan ke File"<br>untuk menyimpan ke perangkat.</div>';
 
   var file=new File([compBlob],compName,{type:'application/zip'});
 
   try{
-    await navigator.share({files:[file],title:compName});
-    showSuccess(card,'File Tersimpan','File sudah disimpan ke lokasi yang kamu pilih.');
-    setBtnDone(btn);
-    toast('ok','Berhasil!','File sudah disimpan');
-  }catch(err){
-    if(err.name==='AbortError'){
-      /* User cancel — tutup overlay aja */
-      overlay.classList.remove('show');
-      resetBtn(btn);
+    /* Coba share walau canShare return false */
+    if(navigator.share){
+      await navigator.share({files:[file],title:compName});
+      showDone(card,'File Tersimpan','File sudah disimpan ke lokasi yang kamu pilih.');
+      setBtnDone(btn);toast('ok','Berhasil!','File disimpan');
       return;
     }
-    /* Gagal — coba metode lain */
-    card.innerHTML=
-      '<div class="share-ok fail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>'+
-      '<div class="share-title">Share Gagal</div>'+
-      '<div class="share-sub">'+err.message+'<br>Coba metode lain:</div>'+
-      '<div class="share-methods">'+
-      (window.showSaveFilePicker?'<button class="share-method-btn primary" onclick="execPicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Pilih Lokasi Simpan</button>':'')+
-      '<button class="share-method-btn" onclick="execDownload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Langsung</button>'+
-      '</div>'+
-      '<button class="share-close" onclick="closeShare()" style="margin-top:10px">Batal</button>';
-    resetBtn(btn);
+  }catch(err){
+    if(err.name==='AbortError'){closeSave();resetBtn(btn);return}
+    /* Gagal — kembali ke pilihan metode */
+    toast('wrn','Share Gagal',err.message||'Tidak didukung di environment ini');
   }
+
+  /* Share gagal/tidak tersedia, tampilkan metode lain */
+  resetBtn(btn);
+  showMethodPickerFallback();
 }
 
-/* ═══ METHOD 2: File System Access API (showSaveFilePicker) ═══ */
-async function execPicker(){
-  var card=document.getElementById('shareCard');
+/* ═══ METODE 2: Buka di External Browser via Telegram API ═══ */
+async function tryTelegramBrowser(){
+  var card=document.getElementById('saveCard');
   var btn=document.getElementById('btnShare');
-
   setBtnBusy(btn);
 
-  card.innerHTML='<div class="share-spinner"></div><div class="share-title">Memilih Lokasi...</div><div class="share-sub">Dialog penyimpanan akan muncul.<br>Pilih folder untuk menyimpan file.</div>';
+  /* Simpan blob ke URL */
+  var url=URL.createObjectURL(compBlob);
+
+  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Membuka Browser...</div><div class="save-sub">File akan terbuka di browser external.<br>Di sana, tap dan hold lalu "Download".</div>';
+
+  await new Promise(function(r){setTimeout(r,500)});
 
   try{
-    var handle = await window.showSaveFilePicker({
-      suggestedName: compName,
-      types: [{
-        description: 'ZIP Archive',
-        accept: {'application/zip': ['.zip']}
-      }]
-    });
-
-    var writable = await handle.createWritable();
-    await writable.write(compBlob);
-    await writable.close();
-
-    showSuccess(card,'File Tersimpan','File berhasil disimpan ke lokasi yang kamu pilih.');
-    setBtnDone(btn);
-    toast('ok','Berhasil!','File sudah disimpan');
-
-  }catch(err){
-    if(err.name==='AbortError'){
-      /* User cancel dialog */
-      document.getElementById('shareOverlay').classList.remove('show');
-      resetBtn(btn);
-      return;
+    if(tgApp&&tgApp.openLink){
+      /* Pakai Telegram WebApp API buat buka di external browser */
+      tgApp.openLink(url);
+    }else if(window.open){
+      window.open(url,'_blank');
     }
-    /* Gagal — tampilkan opsi download */
-    card.innerHTML=
-      '<div class="share-ok fail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>'+
-      '<div class="share-title">Gagal Menyimpan</div>'+
-      '<div class="share-sub">'+err.message+'</div>'+
-      '<div class="share-methods">'+
-      '<button class="share-method-btn primary" onclick="execDownload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Langsung</button>'+
-      '</div>'+
-      '<button class="share-close" onclick="closeShare()" style="margin-top:10px">Batal</button>';
+
+    await new Promise(function(r){setTimeout(r,1500)});
+
+    showDone(card,'Browser Dibuka','File terbuka di browser external.<br>Tap dan hold pada file, lalu pilih "Download" atau "Save".');
+    setBtnDone(btn);toast('ok','Browser Dibuka','Download file dari browser');
+  }catch(err){
+    toast('wrn','Gagal Membuka Browser',err.message);
     resetBtn(btn);
+    showMethodPickerFallback();
   }
 }
 
-/* ═══ METHOD 3: Blob Download Fallback ═══ */
-async function execDownload(){
-  var card=document.getElementById('shareCard');
+/* ═══ METODE 3: File System Access API (showSaveFilePicker) ═══ */
+async function tryPicker(){
+  var card=document.getElementById('saveCard');
   var btn=document.getElementById('btnShare');
-
   setBtnBusy(btn);
 
-  card.innerHTML='<div class="share-spinner"></div><div class="share-title">Downloading...</div><div class="share-sub">File akan diunduh ke folder Downloads.</div>';
+  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Memilih Lokasi...</div><div class="save-sub">Dialog "Save As" akan muncul.<br>Pilih folder tujuan penyimpanan.</div>';
+
+  try{
+    var handle=await window.showSaveFilePicker({
+      suggestedName:compName,
+      types:[{description:'ZIP Archive',accept:{'application/zip':['.zip']}}]
+    });
+    var writable=await handle.createWritable();
+    await writable.write(compBlob);
+    await writable.close();
+    showDone(card,'File Tersimpan','File berhasil disimpan ke lokasi yang kamu pilih.');
+    setBtnDone(btn);toast('ok','Berhasil!','File disimpan');
+  }catch(err){
+    if(err.name==='AbortError'){closeSave();resetBtn(btn);return}
+    toast('wrn','Save Gagal',err.message);
+    resetBtn(btn);showMethodPickerFallback();
+  }
+}
+
+/* ═══ METODE 4: Download Langsung ═══ */
+async function tryDownload(){
+  var card=document.getElementById('saveCard');
+  var btn=document.getElementById('btnShare');
+  setBtnBusy(btn);
+
+  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Downloading...</div><div class="save-sub">File sedang diunduh.<br>Cek folder Downloads di perangkat.</div>';
 
   var url=URL.createObjectURL(compBlob);
   var a=document.createElement('a');a.href=url;a.download=compName;a.style.display='none';
   document.body.appendChild(a);a.click();
-
   await new Promise(function(r){setTimeout(r,1500)});
   document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url)},30000);
 
-  showSuccess(card,'Download Dimulai','Cek folder Downloads di perangkat kamu.');
-  setBtnDone(btn);
-  toast('ok','Download Started','Cek folder Downloads');
+  showDone(card,'Download Dimulai','Cek folder Downloads di perangkat kamu.');
+  setBtnDone(btn);toast('ok','Download Started','Cek folder Downloads');
+}
+
+/* ═══ Fallback picker — tanpa opsi yang udah dicoba & gagal ═══ */
+function showMethodPickerFallback(){
+  var card=document.getElementById('saveCard');
+  var h='<div class="save-title">Coba Metode Lain</div>';
+  h+='<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>';
+  h+='<div class="save-methods">';
+
+  if(isTelegram){
+    h+='<button class="save-mbtn primary" onclick="tryTelegramBrowser()">';
+    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+    h+='<span>Open in Browser<span class="save-mbtn-desc">Buka di Chrome → lalu download</span></span></button>';
+  }
+
+  if(window.showSaveFilePicker){
+    h+='<button class="save-mbtn" onclick="tryPicker()">';
+    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+    h+='<span>Pilih Lokasi Simpan<span class="save-mbtn-desc">Save As dialog</span></span></button>';
+  }
+
+  h+='<button class="save-mbtn" onclick="tryDownload()">';
+  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  h+='<span>Download Langsung<span class="save-mbtn-desc">Simpan ke folder Downloads</span></span></button>';
+
+  h+='</div><button class="save-close" onclick="closeSave()">Batal</button>';
+  card.innerHTML=h;
 }
 
 /* ═══ UI HELPERS ═══ */
-function showSuccess(card,title,msg){
+function showDone(card,title,msg){
   card.innerHTML=
-    '<div class="share-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
-    '<div class="share-title">'+title+'</div>'+
-    '<div class="share-sub">'+msg+'</div>'+
-    '<div class="share-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>'+
-    '<button class="share-close" onclick="closeShare()">Tutup</button>';
+    '<div class="save-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
+    '<div class="save-title">'+title+'</div>'+
+    '<div class="save-sub">'+msg+'</div>'+
+    '<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>'+
+    '<button class="save-close" onclick="closeSave()">Tutup</button>';
 }
-
-function setBtnBusy(btn){
-  btn.classList.add('busy');btn.disabled=true;
-  document.getElementById('btnShareText').textContent='Processing...';
-}
-function setBtnDone(btn){
-  btn.classList.remove('busy');btn.classList.add('done');
-  document.getElementById('btnShareText').textContent='Saved';
-}
-function resetBtn(btn){
-  btn.classList.remove('busy','done');btn.disabled=false;
-  document.getElementById('btnShareText').textContent='Share & Save ('+fmtSize(compSize)+')';
-}
-
-function closeShare(){
-  document.getElementById('shareOverlay').classList.remove('show');
-  var btn=document.getElementById('btnShare');
-  btn.classList.remove('done');btn.disabled=false;
-  document.getElementById('btnShareText').textContent='Share & Save Lagi ('+fmtSize(compSize)+')';
-}
-
-function fmtSize(b){
-  if(b<1024)return b+' B';
-  if(b<1024*1024)return(b/1024).toFixed(1)+' KB';
-  return(b/1024/1024).toFixed(2)+' MB';
-}
-function setProgress(pct,txt){
-  document.getElementById('progPct').textContent=pct+'%';
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progLabel').textContent=txt;
-}
+function setBtnBusy(btn){btn.classList.add('busy');btn.disabled=true;document.getElementById('btnShareText').textContent='Processing...'}
+function setBtnDone(btn){btn.classList.remove('busy');btn.classList.add('done');document.getElementById('btnShareText').textContent='Saved'}
+function resetBtn(btn){btn.classList.remove('busy','done');btn.disabled=false;document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')'}
+function closeSave(){document.getElementById('saveOverlay').classList.remove('show');var btn=document.getElementById('btnShare');btn.classList.remove('done');btn.disabled=false;document.getElementById('btnShareText').textContent='Save File Lagi ('+fmtSize(compSize)+')'}
+function fmtSize(b){if(b<1024)return b+' B';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(2)+' MB'}
+function setProgress(pct,txt){document.getElementById('progPct').textContent=pct+'%';document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=txt}
 </script>
 </body>
 </html>

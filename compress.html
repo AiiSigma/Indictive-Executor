@@ -18,57 +18,112 @@
   --danger:#ff4f6d;--danger-dim:rgba(255,79,109,0.1);
   --warn:#ffb347;--warn-dim:rgba(255,179,71,0.1);
   --info:#5eaeff;--info-dim:rgba(94,174,255,0.1);
-  --success:#0ff0b3;
+  --tg:#29a9eb;--tg-dim:rgba(41,169,235,0.1);
   --text:#e8edf3;--text2:#8899aa;--text3:#4a5e72;
   --r:16px;--r2:12px;--r3:8px;
   --font:'Space Grotesk',system-ui,sans-serif;
   --mono:'JetBrains Mono',monospace;
 }
-body{
-  font-family:var(--font);background:var(--bg);color:var(--text);
-  min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased;
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* ═══ LOGIN ═══ */
+.login-overlay{
+  position:fixed;inset:0;z-index:900;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  transition:opacity 0.4s,visibility 0.4s;
 }
-body::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),
-  radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);
-  pointer-events:none;z-index:0;
+.login-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.login-card{
+  width:100%;max-width:340px;text-align:center;
+  animation:loginIn 0.5s cubic-bezier(0.16,1,0.3,1);
 }
-.wrap{position:relative;z-index:1;padding:0 16px 140px;max-width:460px;margin:0 auto}
-.navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;border-bottom:1px solid var(--border)}
-.navbar-brand{display:flex;align-items:center;gap:10px}
-.navbar-logo{
-  width:36px;height:36px;border-radius:10px;
+@keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.login-logo{
+  width:64px;height:64px;margin:0 auto 20px;border-radius:18px;
   background:linear-gradient(135deg,var(--accent2),var(--accent));
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px var(--accent-glow);
+  box-shadow:0 0 40px var(--accent-glow);position:relative;
 }
-.navbar-logo svg{width:18px;height:18px;color:#080c10}
-.navbar-title{font-size:15px;font-weight:700;letter-spacing:-0.3px}
-.navbar-sub{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
-.navbar-badge{
-  font-size:9px;font-weight:600;padding:4px 8px;border-radius:6px;
-  background:var(--accent-dim);color:var(--accent);border:1px solid rgba(15,240,179,0.15);
-  letter-spacing:0.3px;text-transform:uppercase;
+.login-logo svg{width:28px;height:28px;color:#080c10}
+.login-logo::after{
+  content:'';position:absolute;inset:-6px;border-radius:22px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  opacity:0.15;animation:logoPulse 2.5s ease-in-out infinite;
 }
-.upload-area{
-  margin-top:20px;position:relative;
-  border:1.5px dashed var(--border2);border-radius:var(--r);
-  padding:40px 20px;text-align:center;cursor:pointer;
-  background:var(--card);transition:all 0.3s ease;
+@keyframes logoPulse{0%,100%{transform:scale(1);opacity:0.15}50%{transform:scale(1.08);opacity:0.08}}
+.login-h{font-size:22px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+.login-field{
+  position:relative;margin-bottom:14px;
 }
+.login-input{
+  width:100%;padding:14px 16px 14px 44px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--r2);color:var(--text);font-family:var(--mono);
+  font-size:14px;outline:none;transition:border-color 0.2s;
+}
+.login-input:focus{border-color:var(--accent2)}
+.login-input::placeholder{color:var(--text3);font-family:var(--font)}
+.login-input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--text3);
+}
+.login-hint{font-size:10px;color:var(--text3);text-align:left;margin-bottom:20px;padding:0 4px;line-height:1.5}
+.login-btn{
+  width:100%;padding:15px;border:none;border-radius:var(--r2);
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:#080c10;font-family:var(--font);font-size:15px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+}
+.login-btn:active{transform:scale(0.98)}
+.login-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.login-tg-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:8px;margin-bottom:16px;
+  background:var(--tg-dim);border:1px solid rgba(41,169,235,0.2);
+  font-size:11px;color:var(--tg);font-weight:500;
+}
+.login-tg-badge svg{width:14px;height:14px}
+
+/* ═══ MAIN WRAP ═══ */
+.wrap{position:relative;z-index:1;padding:0 16px 140px;max-width:460px;margin:0 auto}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;border-bottom:1px solid var(--border)}
+.navbar-left{display:flex;align-items:center;gap:10px}
+.navbar-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--accent-glow)}
+.navbar-logo svg{width:17px;height:17px;color:#080c10}
+.navbar-brand{font-size:14px;font-weight:700;letter-spacing:-0.3px}
+.navbar-brand-sub{font-size:9px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase}
+.navbar-right{display:flex;align-items:center;gap:8px}
+.navbar-user{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px 5px 5px;border-radius:20px;
+  background:var(--card);border:1px solid var(--border);
+  font-size:11px;font-weight:600;font-family:var(--mono);color:var(--text2);
+}
+.navbar-avatar{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--accent-mid);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;font-family:var(--font);
+}
+.navbar-icon-btn{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.2s;
+}
+.navbar-icon-btn:active{transform:scale(0.95);background:var(--card2)}
+.navbar-icon-btn svg{width:16px;height:16px;color:var(--text2)}
+
+.upload-area{margin-top:20px;position:relative;border:1.5px dashed var(--border2);border-radius:var(--r);padding:40px 20px;text-align:center;cursor:pointer;background:var(--card);transition:all 0.3s ease}
 .upload-area:active{transform:scale(0.985);border-color:var(--accent2)}
-.upload-area.has-file{border-style:solid;border-color:var(--accent2);background:var(--card)}
-.upload-glow{
-  position:absolute;inset:-1px;border-radius:var(--r);
-  background:radial-gradient(circle at 50% 50%,var(--accent-dim) 0%,transparent 70%);
-  opacity:0;transition:opacity 0.4s;pointer-events:none;
-}
+.upload-area.has-file{border-style:solid;border-color:var(--accent2)}
+.upload-glow{position:absolute;inset:-1px;border-radius:var(--r);background:radial-gradient(circle at 50% 50%,var(--accent-dim) 0%,transparent 70%);opacity:0;transition:opacity 0.4s;pointer-events:none}
 .upload-area.has-file .upload-glow{opacity:1}
-.upload-icon{
-  width:52px;height:52px;margin:0 auto 14px;border-radius:14px;background:var(--card2);
-  display:flex;align-items:center;justify-content:center;transition:all 0.3s;position:relative;z-index:1;
-}
+.upload-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;transition:all 0.3s;position:relative;z-index:1}
 .upload-icon svg{width:22px;height:22px;color:var(--text3);transition:all 0.3s}
 .upload-area.has-file .upload-icon{background:var(--accent-dim)}
 .upload-area.has-file .upload-icon svg{color:var(--accent)}
@@ -76,10 +131,8 @@ body::before{
 .upload-desc{font-size:12px;color:var(--text3);margin-top:4px;position:relative;z-index:1}
 .upload-change{font-size:11px;color:var(--accent);margin-top:8px;display:none;position:relative;z-index:1}
 .upload-area.has-file .upload-change{display:block}
-.file-card{
-  display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
-}
+
+.file-card{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .file-card.show{display:block}
 .file-card-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
 .file-card-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -94,52 +147,36 @@ body::before{
 .file-row-label{color:var(--text2);display:flex;align-items:center;gap:6px}
 .file-row-label svg{width:13px;height:13px;color:var(--text3)}
 .file-row-val{font-weight:600;font-family:var(--mono);font-size:11px}
-.file-row-val.c-accent{color:var(--accent)}
-.file-row-val.c-warn{color:var(--warn)}
-.file-row-val.c-danger{color:var(--danger)}
-.filter-section{
-  display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
-}
+.file-row-val.c-accent{color:var(--accent)}.file-row-val.c-warn{color:var(--warn)}.file-row-val.c-danger{color:var(--danger)}
+
+.filter-section{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .filter-section.show{display:block}
 .filter-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer}
 .filter-head-left{display:flex;align-items:center;gap:8px}
 .filter-head-left svg{width:15px;height:15px;color:var(--accent2)}
 .filter-head-left span{font-size:13px;font-weight:600}
-.filter-toggle-btn{
-  font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;
-  background:var(--card2);color:var(--accent);border:1px solid var(--border);
-  cursor:pointer;font-family:var(--font);letter-spacing:0.3px;
-}
+.filter-toggle-btn{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;background:var(--card2);color:var(--accent);border:1px solid var(--border);cursor:pointer;font-family:var(--font)}
 .filter-body{display:none;padding:0 16px 14px;flex-wrap:wrap;gap:6px}
 .filter-body.show{display:flex}
-.filter-chip{
-  font-size:10px;padding:5px 9px;border-radius:6px;
-  background:var(--card2);color:var(--text3);border:1px solid var(--border);
-  cursor:pointer;transition:all 0.2s;user-select:none;font-family:var(--mono);
-}
+.filter-chip{font-size:10px;padding:5px 9px;border-radius:6px;background:var(--card2);color:var(--text3);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;user-select:none;font-family:var(--mono)}
 .filter-chip:active{transform:scale(0.95)}
 .filter-chip.on{background:var(--accent-dim);color:var(--accent);border-color:rgba(15,240,179,0.25)}
+
 .stats-row{display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
 .stats-row.show{display:grid}
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px 8px;text-align:center}
 .stat-num{font-size:18px;font-weight:700;font-family:var(--mono)}
-.stat-num.cn{color:var(--accent)}.stat-num.cr{color:var(--danger)}
-.stat-num.cb{color:var(--info)}.stat-num.co{color:var(--warn)}
+.stat-num.cn{color:var(--accent)}.stat-num.cr{color:var(--danger)}.stat-num.cb{color:var(--info)}.stat-num.co{color:var(--warn)}
 .stat-lbl{font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
-.progress-box{
-  display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center;
-}
+
+.progress-box{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center}
 .progress-box.show{display:block}
 .progress-pct{font-size:36px;font-weight:700;color:var(--accent);font-family:var(--mono)}
 .progress-track{width:100%;height:4px;background:var(--card2);border-radius:2px;margin:16px 0 12px;overflow:hidden}
 .progress-fill{height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 0.3s ease}
 .progress-label{font-size:11px;color:var(--text2);font-family:var(--mono)}
-.skip-log{
-  display:none;margin-top:14px;
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;max-height:200px;overflow-y:auto;
-}
+
+.skip-log{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;max-height:200px;overflow-y:auto}
 .skip-log.show{display:block}
 .skip-log-head{font-size:12px;font-weight:600;color:var(--warn);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .skip-log-head svg{width:14px;height:14px}
@@ -147,123 +184,112 @@ body::before{
 .skip-item:last-child{border:none}
 .skip-path{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-family:var(--mono)}
 .skip-reason{color:var(--danger);flex-shrink:0;font-family:var(--mono)}
-.result-box{
-  display:none;margin-top:14px;
-  background:var(--card);border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);
-  padding:28px 20px;text-align:center;position:relative;overflow:hidden;
-}
+
+.result-box{display:none;margin-top:14px;background:var(--card);border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);padding:28px 20px;text-align:center;position:relative;overflow:hidden}
 .result-box.show{display:block}
-.result-box::before{
-  content:'';position:absolute;top:-60px;right:-60px;width:160px;height:160px;
-  background:radial-gradient(circle,rgba(15,240,179,0.06) 0%,transparent 70%);pointer-events:none;
-}
-.result-ring{
-  width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-dim);
-  display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accent-glow);
-}
+.result-box::before{content:'';position:absolute;top:-60px;right:-60px;width:160px;height:160px;background:radial-gradient(circle,rgba(15,240,179,0.06) 0%,transparent 70%);pointer-events:none}
+.result-ring{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accent-glow)}
 .result-ring svg{width:26px;height:26px;color:var(--accent)}
 .result-h{font-size:17px;font-weight:700}
 .result-p{font-size:12px;color:var(--text2);margin-top:6px}
 .result-save{font-size:22px;font-weight:700;color:var(--accent);margin-top:10px;font-family:var(--mono)}
 .result-save.muted{color:var(--text3)}
-.act-btn{
-  display:none;width:100%;margin-top:14px;padding:16px;
-  border:none;border-radius:var(--r2);font-family:var(--font);
-  font-size:14px;font-weight:600;cursor:pointer;
-  transition:all 0.25s ease;letter-spacing:0.2px;
-  align-items:center;justify-content:center;gap:10px;
-}
+
+.act-btn{display:none;width:100%;margin-top:14px;padding:16px;border:none;border-radius:var(--r2);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s ease;letter-spacing:0.2px;align-items:center;justify-content:center;gap:10px}
 .act-btn.show{display:flex}
 .act-btn:active{transform:scale(0.975)}
 .act-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 .act-btn svg{width:18px;height:18px;flex-shrink:0}
 .btn-go{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;box-shadow:0 4px 20px var(--accent-glow)}
-.btn-go:active{box-shadow:0 2px 10px var(--accent-glow)}
 .btn-share{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(15,240,179,0.2)}
-.btn-share:active{box-shadow:0 2px 10px rgba(15,240,179,0.2)}
-.btn-share.busy{background:var(--card2);color:var(--text2);box-shadow:none}
-.btn-share.done{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff}
 
-/* ═══ Recovery Banner ═══ */
-.recover-banner{
-  display:none;margin-top:14px;
-  background:linear-gradient(135deg,rgba(15,240,179,0.08),rgba(6,201,142,0.04));
-  border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);
-  padding:18px 16px;text-align:center;
+/* ═══ HISTORY PANEL ═══ */
+.hist-overlay{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(8,12,16,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;justify-content:flex-end;
+  opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s;
 }
-.recover-banner.show{display:block}
-.recover-icon{font-size:28px;margin-bottom:8px}
-.recover-title{font-size:15px;font-weight:700;color:var(--accent)}
-.recover-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5}
-.recover-btn{
-  margin-top:12px;padding:12px 24px;
-  background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;
-  border:none;border-radius:var(--r3);font-family:var(--font);
-  font-size:13px;font-weight:600;cursor:pointer;
+.hist-overlay.show{opacity:1;visibility:visible}
+.hist-panel{
+  width:100%;max-width:380px;height:100%;
+  background:var(--bg2);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);
 }
-.recover-btn:active{transform:scale(0.97)}
+.hist-overlay.show .hist-panel{transform:translateX(0)}
+.hist-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.hist-head-left{display:flex;align-items:center;gap:10px}
+.hist-head-left h2{font-size:16px;font-weight:700}
+.hist-count{
+  font-size:10px;padding:2px 8px;border-radius:10px;
+  background:var(--accent-dim);color:var(--accent);font-weight:600;font-family:var(--mono);
+}
+.hist-close{
+  width:32px;height:32px;border-radius:8px;background:var(--card);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.hist-close svg{width:16px;height:16px;color:var(--text2)}
+.hist-actions{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.hist-action-btn{
+  flex:1;padding:9px;border:1px solid var(--border);border-radius:var(--r3);
+  background:var(--card);color:var(--text2);font-family:var(--font);
+  font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.hist-action-btn:active{background:var(--card2)}
+.hist-action-btn.danger{border-color:rgba(255,79,109,0.2);color:var(--danger)}
+.hist-action-btn.danger:active{background:var(--danger-dim)}
+.hist-list{flex:1;overflow-y:auto;padding:12px 16px}
+.hist-empty{
+  text-align:center;padding:40px 20px;
+}
+.hist-empty-icon{font-size:40px;margin-bottom:12px;opacity:0.3}
+.hist-empty-text{font-size:13px;color:var(--text3);line-height:1.6}
+.hist-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px;margin-bottom:10px;transition:all 0.2s;
+  animation:histCardIn 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes histCardIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.hist-card-top{display:flex;align-items:flex-start;gap:10px}
+.hist-card-icon{
+  width:36px;height:36px;border-radius:8px;background:var(--accent-dim);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.hist-card-icon svg{width:18px;height:18px;color:var(--accent)}
+.hist-card-info{flex:1;min-width:0}
+.hist-card-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-card-meta{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.hist-card-saved{font-size:11px;color:var(--accent);font-weight:600;margin-top:4px}
+.hist-card-date{font-size:9px;color:var(--text3);margin-top:4px}
+.hist-card-btns{display:flex;gap:6px;margin-top:10px}
+.hist-card-btn{
+  flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;
+  background:var(--card2);color:var(--text);font-family:var(--font);
+  font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.hist-card-btn:active{transform:scale(0.97)}
+.hist-card-btn svg{width:13px;height:13px}
+.hist-card-btn.dl{border-color:rgba(15,240,179,0.2);color:var(--accent)}
+.hist-card-btn.del{border-color:rgba(255,79,109,0.15);color:var(--danger)}
 
-/* ═══ Toast ═══ */
-.toast-wrap{position:fixed;top:12px;left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.toast{
-  background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);
-  padding:12px 14px;display:flex;align-items:center;gap:10px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;
-  animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden;
-}
-.toast.out{animation:tOut 0.3s ease forwards}
-.toast-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.toast-ic svg{width:14px;height:14px}
-.toast-ic.ok{background:var(--accent-dim)}.toast-ic.ok svg{color:var(--accent)}
-.toast-ic.err{background:var(--danger-dim)}.toast-ic.err svg{color:var(--danger)}
-.toast-ic.inf{background:var(--info-dim)}.toast-ic.inf svg{color:var(--info)}
-.toast-ic.wrn{background:var(--warn-dim)}.toast-ic.wrn svg{color:var(--warn)}
-.toast-body{flex:1;min-width:0}
-.toast-t{font-size:12px;font-weight:600}
-.toast-m{font-size:10px;color:var(--text2);margin-top:1px}
-.toast-bar{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);animation:tBar 3s linear forwards}
-.toast-bar.ok{background:var(--accent)}.toast-bar.err{background:var(--danger)}
-.toast-bar.inf{background:var(--info)}.toast-bar.wrn{background:var(--warn)}
-@keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes tOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-16px) scale(0.96)}}
-@keyframes tBar{from{width:100%}to{width:0%}}
-
-/* ═══ Save Overlay ═══ */
-.save-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  z-index:500;align-items:flex-end;justify-content:center;
-}
+/* ═══ SAVE SHEET ═══ */
+.save-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:700;align-items:flex-end;justify-content:center}
 .save-overlay.show{display:flex}
-.save-sheet{
-  background:var(--bg2);border-top:1px solid var(--border);
-  border-radius:20px 20px 0 0;padding:12px 16px 28px;
-  width:100%;max-width:460px;
-  animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1);
-}
+.save-sheet{background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:12px 16px 28px;width:100%;max-width:460px;animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .save-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
 .save-sheet-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
-.save-fileinfo{
-  text-align:center;font-family:var(--mono);font-size:11px;color:var(--accent);
-  padding:6px 14px;background:var(--accent-dim);border-radius:6px;display:inline-block;
-  margin:0 auto 16px;word-break:break-all;
-}
 .save-fileinfo-wrap{text-align:center;margin-bottom:16px}
+.save-fileinfo{font-family:var(--mono);font-size:11px;color:var(--accent);padding:6px 14px;background:var(--accent-dim);border-radius:6px;display:inline-block;word-break:break-all}
 .save-methods{display:flex;flex-direction:column;gap:8px}
-.save-mbtn{
-  padding:14px 16px;border:1px solid var(--border);border-radius:var(--r2);
-  background:var(--card);color:var(--text);font-family:var(--font);
-  font-size:13px;font-weight:600;cursor:pointer;display:flex;
-  align-items:center;gap:12px;transition:all 0.2s;text-align:left;
-  text-decoration:none;
-}
+.save-mbtn{padding:14px 16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--card);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s;text-align:left;text-decoration:none}
 .save-mbtn:active{transform:scale(0.98);background:var(--card2)}
-.save-mbtn svg{width:20px;height:20px;flex-shrink:0}
-.save-mbtn-icon{
-  width:40px;height:40px;border-radius:10px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
+.save-mbtn-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .save-mbtn-icon svg{width:20px;height:20px}
 .save-mbtn-body{flex:1;min-width:0}
 .save-mbtn-name{font-size:13px;font-weight:600;display:block}
@@ -275,55 +301,34 @@ body::before{
 .save-mbtn.secondary .save-mbtn-icon svg{color:var(--text2)}
 .save-mbtn.tg .save-mbtn-icon{background:rgba(94,174,255,0.12)}
 .save-mbtn.tg .save-mbtn-icon svg{color:var(--info)}
-.save-cancel{
-  margin-top:12px;width:100%;padding:12px;
-  background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);
-  color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);
-}
+.save-cancel{margin-top:12px;width:100%;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
 .save-cancel:active{background:var(--border)}
 
-/* ═══ Processing overlay ═══ */
-.proc-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  z-index:600;align-items:center;justify-content:center;padding:32px;
-}
-.proc-overlay.show{display:flex}
-.proc-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:36px 24px;text-align:center;max-width:280px;width:100%;
-  animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);
-}
-.proc-spinner{width:44px;height:44px;margin:0 auto 14px;position:relative}
-.proc-spinner::before{content:'';position:absolute;inset:0;border:3px solid var(--card2);border-radius:50%}
-.proc-spinner::after{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.proc-ok{
-  width:48px;height:48px;margin:0 auto 14px;background:var(--accent-dim);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;animation:tIn 0.4s cubic-bezier(0.16,1,0.3,1);
-}
-.proc-ok svg{width:24px;height:24px;color:var(--accent)}
-.proc-title{font-size:15px;font-weight:700}
-.proc-sub{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
-.proc-close{
-  margin-top:18px;padding:9px 24px;
-  background:var(--card2);border:1px solid var(--border);border-radius:var(--r3);
-  color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);
-}
-.proc-close:active{background:var(--border)}
+/* ═══ TOAST ═══ */
+.toast-wrap{position:fixed;top:12px;left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden}
+.toast.out{animation:tOut 0.3s ease forwards}
+.toast-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-ic svg{width:14px;height:14px}
+.toast-ic.ok{background:var(--accent-dim)}.toast-ic.ok svg{color:var(--accent)}
+.toast-ic.err{background:var(--danger-dim)}.toast-ic.err svg{color:var(--danger)}
+.toast-ic.inf{background:var(--info-dim)}.toast-ic.inf svg{color:var(--info)}
+.toast-ic.wrn{background:var(--warn-dim)}.toast-ic.wrn svg{color:var(--warn)}
+.toast-body{flex:1;min-width:0}
+.toast-t{font-size:12px;font-weight:600}
+.toast-m{font-size:10px;color:var(--text2);margin-top:1px}
+.toast-bar{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);animation:tBar 3s linear forwards}
+.toast-bar.ok{background:var(--accent)}.toast-bar.err{background:var(--danger)}.toast-bar.inf{background:var(--info)}.toast-bar.wrn{background:var(--warn)}
+@keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-16px) scale(0.96)}}
+@keyframes tBar{from{width:100%}to{width:0%}}
 
-.bottom-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--bg2);border-top:1px solid var(--border);
-  padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:10;
-}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:10}
 .bottom-icon{width:28px;height:28px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .bottom-icon svg{width:13px;height:13px;color:var(--accent2)}
 .bottom-text{font-size:10px;color:var(--text2);line-height:1.5}
 #fileInput{display:none}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
 </style>
 </head>
@@ -331,33 +336,76 @@ body::before{
 
 <input type="file" id="fileInput" accept=".zip">
 <div class="toast-wrap" id="toastWrap"></div>
-<div class="save-overlay" id="saveOverlay"><div class="save-sheet" id="saveSheet"></div></div>
-<div class="proc-overlay" id="procOverlay"><div class="proc-card" id="procCard"></div></div>
 
+<!-- ═══ LOGIN OVERLAY ═══ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div class="login-h">ZIP Compress</div>
+    <div class="login-sub">Masukkan Telegram ID untuk memulai.<br>Setiap user punya riwayat compress masing-masing.</div>
+    <div id="loginTgBadge" style="display:none" class="login-tg-badge">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+      <span id="loginTgName">Terverifikasi</span>
+    </div>
+    <div class="login-field">
+      <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" class="login-input" id="loginInput" placeholder="Contoh: 123456789" autocomplete="off">
+    </div>
+    <div class="login-hint">Masukkan ID Telegram kamu (angka). Bisa dilihat di @userinfobot atau profil Telegram.</div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Masuk</button>
+  </div>
+</div>
+
+<!-- ═══ HISTORY PANEL ═══ -->
+<div class="hist-overlay" id="histOverlay" onclick="closeHistIfBg(event)">
+  <div class="hist-panel">
+    <div class="hist-head">
+      <div class="hist-head-left"><h2>Riwayat</h2><span class="hist-count" id="histCount">0</span></div>
+      <div class="hist-close" onclick="closeHist()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="hist-actions">
+      <button class="hist-action-btn" onclick="refreshHist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+      <button class="hist-action-btn danger" onclick="clearAllHist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Hapus Semua
+      </button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+</div>
+
+<!-- ═══ SAVE SHEET ═══ -->
+<div class="save-overlay" id="saveOverlay"><div class="save-sheet" id="saveSheet"></div></div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
 <div class="wrap">
   <div class="navbar">
-    <div class="navbar-brand">
-      <div class="navbar-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </div>
-      <div><div class="navbar-title">ZIP Compress</div><div class="navbar-sub">Flutter Build Bot</div></div>
+    <div class="navbar-left">
+      <div class="navbar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div><div class="navbar-brand">ZIP Compress</div><div class="navbar-brand-sub">Flutter Build Bot</div></div>
     </div>
-    <div class="navbar-badge">v2.2</div>
-  </div>
-
-  <!-- Recovery Banner: muncul kalau ada file tersimpan dari sesi sebelumnya -->
-  <div class="recover-banner" id="recoverBanner">
-    <div class="recover-icon">&#x1F4E6;</div>
-    <div class="recover-title">File Compress Tersedia</div>
-    <div class="recover-sub" id="recoverSub">Kamu punya file hasil compress dari sesi sebelumnya</div>
-    <button class="recover-btn" id="recoverBtn" onclick="recoverCached()">Lihat & Simpan File</button>
+    <div class="navbar-right">
+      <div class="navbar-user" id="navUser">
+        <div class="navbar-avatar" id="navAvatar">?</div>
+        <span id="navUserId">—</span>
+      </div>
+      <div class="navbar-icon-btn" onclick="openHist()" title="Riwayat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="navbar-icon-btn" onclick="doLogout()" title="Keluar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+    </div>
   </div>
 
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
     <div class="upload-glow"></div>
-    <div class="upload-icon" id="uploadIconBox">
-      <svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    </div>
+    <div class="upload-icon"><svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
     <div class="upload-title" id="uploadTitle">Tap to Upload ZIP</div>
     <div class="upload-desc" id="uploadDesc">Pilih project Flutter untuk di-compress</div>
     <div class="upload-change" id="uploadChange">Tap untuk ganti file</div>
@@ -370,23 +418,14 @@ body::before{
       <div class="file-card-size" id="cardSize">—</div>
     </div>
     <div class="file-card-rows">
-      <div class="file-row">
-        <span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Original</span>
-        <span class="file-row-val" id="rowOriginal">—</span>
-      </div>
-      <div class="file-row">
-        <span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Status</span>
-        <span class="file-row-val" id="rowStatus">—</span>
-      </div>
+      <div class="file-row"><span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Original</span><span class="file-row-val" id="rowOriginal">—</span></div>
+      <div class="file-row"><span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Status</span><span class="file-row-val" id="rowStatus">—</span></div>
     </div>
   </div>
 
   <div class="filter-section" id="filterSection">
     <div class="filter-head" onclick="toggleFilter()">
-      <div class="filter-head-left">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-        <span>Filter Settings</span>
-      </div>
+      <div class="filter-head-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Filter Settings</span></div>
       <button class="filter-toggle-btn" id="filterToggle">Show</button>
     </div>
     <div class="filter-body" id="filterBody"></div>
@@ -406,17 +445,12 @@ body::before{
   </div>
 
   <div class="skip-log" id="skipLog">
-    <div class="skip-log-head">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      Removed Files
-    </div>
+    <div class="skip-log-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Removed Files</div>
     <div id="skipList"></div>
   </div>
 
   <div class="result-box" id="resultBox">
-    <div class="result-ring">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    </div>
+    <div class="result-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
     <div class="result-h">Compression Complete</div>
     <div class="result-p" id="resultP"></div>
     <div class="result-save" id="resultSave"></div>
@@ -426,7 +460,6 @@ body::before{
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
     <span>Compress ZIP</span>
   </button>
-
   <button class="act-btn btn-share" id="btnShare" onclick="openSaveSheet()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     <span id="btnShareText">Save File</span>
@@ -434,105 +467,241 @@ body::before{
 </div>
 
 <div class="bottom-bar">
-  <div class="bottom-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  </div>
-  <div class="bottom-text">Upload ZIP &rarr; Compress &amp; bersihkan &rarr; Pilih metode simpan</div>
+  <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+  <div class="bottom-text">Login &rarr; Upload ZIP &rarr; Compress &rarr; Simpan ke riwayat</div>
 </div>
 
 <script>
 /* ═══ CONFIG ═══ */
 var SKIP_PATTERNS=[
-  {pattern:'.dart_tool/',desc:'.dart_tool/',active:true},
-  {pattern:'.gradle/',desc:'.gradle/',active:true},
-  {pattern:'.idea/',desc:'.idea/',active:true},
-  {pattern:'build/',desc:'build/',active:true},
-  {pattern:'.git/',desc:'.git/',active:true},
-  {pattern:'node_modules/',desc:'node_modules/',active:true},
-  {pattern:'.DS_Store',desc:'.DS_Store',active:true},
-  {pattern:'ios/Pods/',desc:'ios/Pods/',active:true},
+  {pattern:'.dart_tool/',desc:'.dart_tool/',active:true},{pattern:'.gradle/',desc:'.gradle/',active:true},
+  {pattern:'.idea/',desc:'.idea/',active:true},{pattern:'build/',desc:'build/',active:true},
+  {pattern:'.git/',desc:'.git/',active:true},{pattern:'node_modules/',desc:'node_modules/',active:true},
+  {pattern:'.DS_Store',desc:'.DS_Store',active:true},{pattern:'ios/Pods/',desc:'ios/Pods/',active:true},
   {pattern:'windows/flutter/generated_plugins/',desc:'win/plugins/',active:true},
   {pattern:'linux/flutter/generated_plugins/',desc:'linux/plugins/',active:true},
   {pattern:'.metadata',desc:'.metadata',active:true},
 ];
 var SKIP_EXT=['.iml','.class'];
 var MAX_FILE=50*1024*1024;
-var origZip=null,origSize=0,compBlob=null,compSize=0,compName='',analysis=null;
-var blobUrl=null;
+var MAX_RECORDS=20;
 
-/* ═══ Deteksi Environment ═══ */
+var origZip=null,origSize=0,compBlob=null,compSize=0,compName='',analysis=null;
+var blobUrl=null,currentUserId=null,currentUserName=null;
 var isTelegram=!!(window.Telegram&&window.Telegram.WebApp);
 var tgApp=isTelegram?window.Telegram.WebApp:null;
 if(tgApp){try{tgApp.ready()}catch(e){}}
 
-/* ═══ Cache Storage — simpan file antar sesi ═══ */
-var CACHE_NAME='zip-compress-v1';
-var CACHE_KEY='/compressed-result';
-
-async function cacheCompressedBlob(blob,name,size,origSz){
-  try{
-    var cache=await caches.open(CACHE_NAME);
-    var resp=new Response(blob,{headers:{
-      'Content-Type':'application/zip',
-      'X-Filename':name,
-      'X-Size':String(size),
-      'X-Original-Size':String(origSz)
-    }});
-    await cache.put(CACHE_KEY,resp);
-  }catch(e){console.warn('Cache write failed:',e)}
-}
-
-async function getCachedCompressed(){
-  try{
-    var cache=await caches.open(CACHE_NAME);
-    var resp=await cache.match(CACHE_KEY);
-    if(!resp)return null;
-    return{
-      blob:await resp.blob(),
-      name:resp.headers.get('X-Filename')||'project-clean.zip',
-      size:parseInt(resp.headers.get('X-Size')||'0'),
-      origSize:parseInt(resp.headers.get('X-Original-Size')||'0')
+/* ═══ INDEXEDDB ═══ */
+var DB_NAME='ZipCompressDB';var DB_VER=1;var STORE='history';
+function openDB(){
+  return new Promise(function(resolve,reject){
+    var req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=function(e){
+      var db=e.target.result;
+      if(!db.objectStoreNames.contains(STORE)){
+        var s=db.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});
+        s.createIndex('userId','userId',{unique:false});
+      }
     };
-  }catch(e){console.warn('Cache read failed:',e);return null}
+    req.onsuccess=function(e){resolve(e.target.result)};
+    req.onerror=function(e){reject(e.target.error)};
+  });
+}
+function dbAdd(record){
+  return openDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(STORE,'readwrite');
+      var store=tx.objectStore(STORE);
+      /* Cek jumlah record user, hapus paling lama kalau melebihi batas */
+      var idx=store.index('userId');
+      var getAll=idx.getAll(currentUserId);
+      getAll.onsuccess=function(){
+        var existing=getAll.result;
+        if(existing.length>=MAX_RECORDS){
+          /* Hapus record tertua */
+          existing.sort(function(a,b){return a.id-b.id});
+          var toDelete=existing.slice(0,existing.length-MAX_RECORDS+1);
+          toDelete.forEach(function(r){store.delete(r.id)});
+        }
+        var addReq=store.add(record);
+        addReq.onsuccess=function(){resolve(addReq.result)};
+        addReq.onerror=function(){reject(addReq.error)};
+      };
+    });
+  });
+}
+function dbGetAll(){
+  return openDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(STORE,'readonly');
+      var idx=tx.objectStore(STORE).index('userId');
+      var req=idx.getAll(currentUserId);
+      req.onsuccess=function(){resolve(req.result.sort(function(a,b){return b.id-a.id}))};
+      req.onerror=function(){reject(req.error)};
+    });
+  });
+}
+function dbGet(id){
+  return openDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(STORE,'readonly');
+      var req=tx.objectStore(STORE).get(id);
+      req.onsuccess=function(){resolve(req.result)};
+      req.onerror=function(){reject(req.error)};
+    });
+  });
+}
+function dbDelete(id){
+  return openDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(STORE,'readwrite');
+      var req=tx.objectStore(STORE).delete(id);
+      req.onsuccess=function(){resolve()};
+      req.onerror=function(){reject(req.error)};
+    });
+  });
+}
+function dbClearUser(){
+  return openDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(STORE,'readwrite');
+      var store=tx.objectStore(STORE);
+      var idx=store.index('userId');
+      var req=idx.openCursor(IDBKeyRange.only(currentUserId));
+      req.onsuccess=function(e){
+        var cursor=e.target.result;
+        if(cursor){cursor.delete();cursor.continue()}
+        else{resolve()}
+      };
+      req.onerror=function(){reject(req.error)};
+    });
+  });
 }
 
-async function clearCachedCompressed(){
-  try{var cache=await caches.open(CACHE_NAME);await cache.delete(CACHE_KEY)}catch(e){}
-}
-
-/* ═══ Cek cache saat pertama kali load ═══ */
-(async function(){
-  var cached=await getCachedCompressed();
-  if(cached&&cached.blob&&cached.blob.size>0){
-    compBlob=cached.blob;compSize=cached.size;compName=cached.name;origSize=cached.origSize;
-    var banner=document.getElementById('recoverBanner');
-    banner.classList.add('show');
-    document.getElementById('recoverSub').textContent=
-      compName+' ('+fmtSize(compSize)+') — dari sesi sebelumnya';
+/* ═══ AUTH ═══ */
+function checkSession(){
+  var saved=localStorage.getItem('zipcomp_user');
+  if(saved){
+    try{
+      var d=JSON.parse(saved);
+      currentUserId=d.id;currentUserName=d.name;
+      activateSession();return;
+    }catch(e){}
   }
-})();
-
-/* Recovery: tampilkan hasil compress dari cache */
-function recoverCached(){
-  var banner=document.getElementById('recoverBanner');banner.classList.remove('show');
-
-  /* Tampilkan result card */
-  var saved=origSize-compSize;
-  var savedPct=origSize>0?Math.round((saved/origSize)*100):0;
-  document.getElementById('resultBox').classList.add('show');
-  document.getElementById('resultP').textContent='File sudah di-compress sebelumnya';
-  var rs=document.getElementById('resultSave');
-  if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}
-  else{rs.textContent='Siap disimpan';rs.className='result-save muted'}
-
-  document.getElementById('sCompressed').textContent=fmtSize(compSize);
-
-  /* Tampilkan tombol save */
-  var sb=document.getElementById('btnShare');sb.classList.add('show');
-  document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
-
-  toast('ok','File Ditemukan','Hasil compress sebelumnya tersedia. Tap Save untuk menyimpan.');
+  /* Cek Telegram auto-login */
+  if(tgApp&&tgApp.initDataUnsafe&&tgApp.initDataUnsafe.user){
+    var u=tgApp.initDataUnsafe.user;
+    currentUserId=String(u.id);
+    currentUserName=u.first_name||u.username||u.id;
+    localStorage.setItem('zipcomp_user',JSON.stringify({id:currentUserId,name:currentUserName}));
+    activateSession();return;
+  }
+  showLogin();
 }
+
+function showLogin(){
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  /* Cek Telegram auto-fill */
+  if(tgApp&&tgApp.initDataUnsafe&&tgApp.initDataUnsafe.user){
+    var u=tgApp.initDataUnsafe.user;
+    document.getElementById('loginInput').value=u.id;
+    document.getElementById('loginInput').disabled=true;
+    document.getElementById('loginTgBadge').style.display='inline-flex';
+    document.getElementById('loginTgName').textContent=u.first_name||u.username||'Terverifikasi';
+  }
+}
+
+function doLogin(){
+  var input=document.getElementById('loginInput').value.trim();
+  if(!input){toast('err','Gagal','Masukkan Telegram ID');return}
+  currentUserId=input;
+  currentUserName=input;
+  localStorage.setItem('zipcomp_user',JSON.stringify({id:currentUserId,name:currentUserName}));
+  activateSession();
+  toast('ok','Selamat Datang','ID: '+currentUserId);
+}
+
+function activateSession(){
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('navUserId').textContent=currentUserId;
+  document.getElementById('navAvatar').textContent=(currentUserName||currentUserId).charAt(0).toUpperCase();
+}
+
+function doLogout(){
+  if(!confirm('Keluar dari sesi? Riwayat tetap tersimpan untuk ID ini.'))return;
+  localStorage.removeItem('zipcomp_user');
+  currentUserId=null;currentUserName=null;
+  location.reload();
+}
+
+/* ═══ HISTORY ═══ */
+function openHist(){
+  document.getElementById('histOverlay').classList.add('show');
+  refreshHist();
+}
+function closeHist(){document.getElementById('histOverlay').classList.remove('show')}
+function closeHistIfBg(e){if(e.target===document.getElementById('histOverlay'))closeHist()}
+
+async function refreshHist(){
+  var list=document.getElementById('histList');
+  try{
+    var records=await dbGetAll();
+    document.getElementById('histCount').textContent=records.length;
+    if(records.length===0){
+      list.innerHTML='<div class="hist-empty"><div class="hist-empty-icon">&#128230;</div><div class="hist-empty-text">Belum ada riwayat compress.<br>Upload dan compress file ZIP untuk memulai.</div></div>';
+      return;
+    }
+    var h='';
+    records.forEach(function(r){
+      var dateStr=new Date(r.createdAt).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      h+='<div class="hist-card" id="hcard-'+r.id+'">';
+      h+='<div class="hist-card-top">';
+      h+='<div class="hist-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
+      h+='<div class="hist-card-info"><div class="hist-card-name">'+escHtml(r.fileName)+'</div>';
+      h+='<div class="hist-card-meta">'+fmtSize(r.origSize)+' &rarr; '+fmtSize(r.compSize)+'</div>';
+      if(r.savedPct>0)h+='<div class="hist-card-saved">Hemat '+r.savedPct+'%</div>';
+      h+='<div class="hist-card-date">'+dateStr+'</div></div></div>';
+      h+='<div class="hist-card-btns">';
+      h+='<button class="hist-card-btn dl" onclick="histDownload('+r.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save</button>';
+      h+='<button class="hist-card-btn del" onclick="histDelete('+r.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Hapus</button>';
+      h+='</div></div>';
+    });
+    list.innerHTML=h;
+  }catch(e){
+    list.innerHTML='<div class="hist-empty"><div class="hist-empty-text">Error: '+e.message+'</div></div>';
+  }
+}
+
+async function histDownload(id){
+  try{
+    var record=await dbGet(id);
+    if(!record||!record.blob){toast('err','Error','File tidak ditemukan di database');return}
+    compBlob=record.blob;compSize=record.compSize;compName=record.fileName;
+    openSaveSheet();
+  }catch(e){toast('err','Error',e.message)}
+}
+
+async function histDelete(id){
+  if(!confirm('Hapus riwayat ini?'))return;
+  try{
+    await dbDelete(id);
+    var card=document.getElementById('hcard-'+id);
+    if(card){card.style.opacity='0';card.style.transform='translateX(40px)';card.style.transition='all 0.3s';setTimeout(function(){refreshHist()},300)}
+    else{refreshHist()}
+    toast('ok','Dihapus','Riwayat berhasil dihapus');
+  }catch(e){toast('err','Error',e.message)}
+}
+
+async function clearAllHist(){
+  if(!confirm('Hapus semua riwayat compress? File yang sudah disimpan di perangkat tidak ikut terhapus.'))return;
+  try{
+    await dbClearUser();refreshHist();
+    toast('ok','Dihapus','Semua riwayat berhasil dihapus');
+  }catch(e){toast('err','Error',e.message)}
+}
+
+function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
 /* ═══ TOAST ═══ */
 function toast(type,title,msg,dur){
@@ -570,8 +739,7 @@ function toggleFilter(){
 document.getElementById('fileInput').addEventListener('change',async function(e){
   var file=e.target.files[0];if(!file)return;
   if(!file.name.endsWith('.zip')){toast('err','Invalid File','Hanya file .zip yang diperbolehkan');return}
-  var area=document.getElementById('uploadArea');
-  area.classList.add('has-file');
+  var area=document.getElementById('uploadArea');area.classList.add('has-file');
   document.getElementById('uploadTitle').textContent=file.name;
   document.getElementById('uploadDesc').textContent=fmtSize(file.size);
   document.getElementById('uploadChange').style.display='block';
@@ -585,7 +753,7 @@ document.getElementById('fileInput').addEventListener('change',async function(e)
   document.getElementById('statusDot').className='file-card-dot yellow';
   document.getElementById('filterSection').classList.add('show');
   origSize=file.size;
-  try{origZip=await JSZip.loadAsync(file);await analyzeZip();toast('ok','File Loaded',file.name+' berhasil dibaca')}
+  try{origZip=await JSZip.loadAsync(file);await analyzeZip();toast('ok','File Loaded',file.name)}
   catch(err){document.getElementById('rowStatus').textContent='Error: '+err.message;document.getElementById('rowStatus').className='file-row-val c-danger';document.getElementById('statusDot').className='file-card-dot red';toast('err','Read Error',err.message)}
 });
 
@@ -628,7 +796,7 @@ async function startCompress(){
   if(!origZip)return;
   var btn=document.getElementById('btnGo');btn.disabled=true;btn.querySelector('span').textContent='Compressing...';
   document.getElementById('progressBox').classList.add('show');
-  toast('inf','Compressing','Memproses file, mohon tunggu...',4000);
+  toast('inf','Compressing','Memproses file...',4000);
   try{
     var newZip=new JSZip();var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
     var processed=0,total=entries.length,kept=0,skipped=0;
@@ -652,165 +820,99 @@ async function startCompress(){
     var rs=document.getElementById('resultSave');
     if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
 
-    /* Simpan ke Cache Storage biar bisa di-recover */
-    await cacheCompressedBlob(compBlob,compName,compSize,origSize);
+    /* Simpan ke IndexedDB — riwayat user */
+    try{
+      await dbAdd({
+        userId:currentUserId,
+        fileName:compName,
+        origSize:origSize,
+        compSize:compSize,
+        savedPct:savedPct,
+        createdAt:new Date().toISOString(),
+        blob:compBlob
+      });
+      toast('inf','Tersimpan','File ditambahkan ke riwayat');
+    }catch(dbErr){
+      console.warn('DB save failed:',dbErr);
+      /* Kalau gagal simpan blob (quota), simpan tanpa blob */
+      try{
+        await dbAdd({userId:currentUserId,fileName:compName,origSize:origSize,compSize:compSize,savedPct:savedPct,createdAt:new Date().toISOString(),blob:null});
+      }catch(e2){}
+    }
 
     var sb=document.getElementById('btnShare');sb.classList.add('show');
     document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
     btn.classList.remove('show');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';
-    toast('ok','Compress Berhasil','Tap "Save File" untuk menyimpan');
+    toast('ok','Berhasil','Tap "Save File" untuk menyimpan');
   }catch(err){console.error(err);setProgress(0,'Error');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';toast('err','Failed',err.message,5000)}
 }
 
-/* ═══════════════════════════════════════════════════════
-   SAVE SHEET — Bottom Sheet dengan semua metode
-   ═══════════════════════════════════════════════════════ */
+/* ═══ SAVE SHEET ═══ */
 function openSaveSheet(){
   if(!compBlob){toast('err','Error','Tidak ada file');return}
-
-  /* Buat blob URL sekali, dipakai semua metode */
   if(blobUrl)URL.revokeObjectURL(blobUrl);
   blobUrl=URL.createObjectURL(compBlob);
-
   var sheet=document.getElementById('saveSheet');
-  var overlay=document.getElementById('saveOverlay');
-  overlay.classList.add('show');
-
-  var h='<div class="save-handle"></div>';
-  h+='<div class="save-sheet-title">Simpan File</div>';
+  var overlay=document.getElementById('saveOverlay');overlay.classList.add('show');
+  var h='<div class="save-handle"></div><div class="save-sheet-title">Simpan File</div>';
   h+='<div class="save-fileinfo-wrap"><div class="save-fileinfo">'+compName+' &mdash; '+fmtSize(compSize)+'</div></div>';
   h+='<div class="save-methods">';
-
-  /* ═══ METODE 1: Download Link — <a> tag asli yang user tap langsung ═══ */
-  h+='<a class="save-mbtn primary" href="'+blobUrl+'" download="'+compName+'" onclick="onDirectDownload(this,event)">';
+  h+='<a class="save-mbtn primary" href="'+blobUrl+'" download="'+compName+'" onclick="toast(\'ok\',\'Downloading...\',\'Jika gagal, long-press dan pilih Save link\')">';
   h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>';
-  h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Tap to Download</span><span class="save-mbtn-desc">Tap langsung di sini untuk download. Kalau tidak berfungsi, long-press dan pilih "Save link".</span></div>';
-  h+='</a>';
-
-  /* ═══ METODE 2: Buka di Browser External (khusus Telegram) ═══ */
+  h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Tap to Download</span><span class="save-mbtn-desc">Tap langsung untuk download. Long-press dan "Save link" jika tidak jalan.</span></div></a>';
   if(isTelegram){
     h+='<button class="save-mbtn tg" onclick="openInExternalBrowser()">';
     h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Open in Browser</span><span class="save-mbtn-desc">Buka halaman ini di Chrome. File hasil compress akan otomatis tersedia di sana (tidak perlu compress ulang).</span></div>';
-    h+='</button>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Open in Browser</span><span class="save-mbtn-desc">Buka di Chrome untuk download lebih mudah</span></div></button>';
   }
-
-  /* ═══ METODE 3: Web Share API ═══ */
   if(navigator.share){
     h+='<button class="save-mbtn secondary" onclick="tryWebShare()">';
     h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Share File</span><span class="save-mbtn-desc">Buka share sheet — pilih "Save to Files" untuk simpan ke perangkat.</span></div>';
-    h+='</button>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Share File</span><span class="save-mbtn-desc">Buka share sheet — pilih Save to Files</span></div></button>';
   }
-
-  /* ═══ METODE 4: Save As Picker (desktop Chrome) ═══ */
   if(window.showSaveFilePicker){
     h+='<button class="save-mbtn secondary" onclick="trySaveAs()">';
     h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Save As...</span><span class="save-mbtn-desc">Pilih lokasi folder penyimpanan (Chrome desktop).</span></div>';
-    h+='</button>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Save As...</span><span class="save-mbtn-desc">Pilih lokasi folder (Chrome desktop)</span></div></button>';
   }
-
-  h+='</div>';/* end save-methods */
-  h+='<button class="save-cancel" onclick="closeSaveSheet()">Batal</button>';
+  h+='</div><button class="save-cancel" onclick="closeSaveSheet()">Batal</button>';
   sheet.innerHTML=h;
 }
 
-/* ═══ METODE 1: Direct Download — user tap <a> langsung ═══ */
-function onDirectDownload(el,e){
-  /* Biarkan browser handle download secara native.
-     Jika di WebView download diblokir, long-press akan jadi fallback. */
-  setTimeout(function(){
-    toast('ok','Download','Jika file tidak muncul di Downloads, coba long-press tombol hijau di atas lalu pilih "Save link".');
-  },1000);
-}
-
-/* ═══ METODE 2: Buka di External Browser via Telegram API ═══ */
 async function openInExternalBrowser(){
-  var sheet=document.getElementById('saveSheet');
-
-  /* Simpan dulu ke Cache Storage */
-  await cacheCompressedBlob(compBlob,compName,compSize,origSize);
-
-  /* Tampilkan panduan */
-  sheet.innerHTML=
-    '<div class="save-handle"></div>'+
-    '<div class="save-sheet-title">Buka di Browser</div>'+
-    '<div style="padding:16px;text-align:center">'+
-      '<div style="font-size:13px;color:var(--text2);line-height:1.7;text-align:left;margin-bottom:16px">'+
-        '<div style="font-weight:600;color:var(--info);margin-bottom:8px">Ikuti langkah ini:</div>'+
-        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
-          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>'+
-          '<span>Tap tombol di bawah untuk buka halaman ini di Chrome</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
-          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>'+
-          '<span>Di Chrome, akan muncul banner "File Compress Tersedia"</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
-          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>'+
-          '<span>Tap "Lihat & Simpan File" lalu pilih download</span>'+
-        '</div>'+
-      '</div>'+
-      '<button class="save-mbtn tg" onclick="doOpenBrowser()" style="width:100%">'+
-        '<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>'+
-        '<div class="save-mbtn-body"><span class="save-mbtn-name">Buka di Chrome Sekarang</span><span class="save-mbtn-desc">File compress akan otomatis tersedia di sana</span></div>'+
-      '</button>'+
-      '<button class="save-cancel" onclick="openSaveSheet()" style="margin-top:8px">Kembali</button>'+
-    '</div>';
+  /* Simpan ke Cache Storage dulu */
+  try{
+    var cache=await caches.open('zipcomp-temp');
+    var resp=new Response(compBlob,{headers:{'Content-Type':'application/zip','X-Filename':compName}});
+    await cache.put('/compressed-result',resp);
+  }catch(e){}
+  if(tgApp&&tgApp.openLink){tgApp.openLink(window.location.href)}
+  else{window.open(window.location.href,'_blank')}
+  closeSaveSheet();toast('inf','Browser Dibuka','Cari banner file di Chrome');
 }
 
-async function doOpenBrowser(){
-  /* Buka halaman ini di external browser via Telegram API */
-  var pageUrl=window.location.href;
-  if(tgApp&&tgApp.openLink){
-    tgApp.openLink(pageUrl);
-  }else{
-    window.open(pageUrl,'_blank');
-  }
-  closeSaveSheet();
-  toast('inf','Browser Dibuka','Cari banner "File Compress Tersedia" di Chrome');
-}
-
-/* ═══ METODE 3: Web Share API ═══ */
 async function tryWebShare(){
   var file=new File([compBlob],compName,{type:'application/zip'});
-  try{
-    await navigator.share({files:[file],title:compName});
-    toast('ok','Berhasil!','File sudah di-share/disimpan');
-    closeSaveSheet();
-  }catch(err){
-    if(err.name==='AbortError')return;
-    toast('wrn','Share Gagal',err.message||'Tidak didukung');
-  }
+  try{await navigator.share({files:[file],title:compName});toast('ok','Berhasil!','File di-share');closeSaveSheet()}
+  catch(err){if(err.name!=='AbortError')toast('wrn','Share Gagal',err.message)}
 }
 
-/* ═══ METODE 4: Save As Picker ═══ */
 async function trySaveAs(){
   try{
-    var handle=await window.showSaveFilePicker({
-      suggestedName:compName,
-      types:[{description:'ZIP Archive',accept:{'application/zip':['.zip']}}]
-    });
-    var writable=await handle.createWritable();
-    await writable.write(compBlob);
-    await writable.close();
-    toast('ok','Berhasil!','File disimpan ke lokasi yang dipilih');
-    closeSaveSheet();
-  }catch(err){
-    if(err.name==='AbortError')return;
-    toast('wrn','Save Gagal',err.message);
-  }
+    var handle=await window.showSaveFilePicker({suggestedName:compName,types:[{description:'ZIP',accept:{'application/zip':['.zip']}}]});
+    var w=await handle.createWritable();await w.write(compBlob);await w.close();
+    toast('ok','Berhasil!','File disimpan');closeSaveSheet();
+  }catch(err){if(err.name!=='AbortError')toast('wrn','Save Gagal',err.message)}
 }
 
-/* ═══ Close ═══ */
-function closeSaveSheet(){
-  document.getElementById('saveOverlay').classList.remove('show');
-}
+function closeSaveSheet(){document.getElementById('saveOverlay').classList.remove('show')}
 
 /* ═══ HELPERS ═══ */
 function fmtSize(b){if(b<1024)return b+' B';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(2)+' MB'}
 function setProgress(pct,txt){document.getElementById('progPct').textContent=pct+'%';document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=txt}
+
+/* ═══ INIT ═══ */
+checkSession();
 </script>
 </body>
 </html>

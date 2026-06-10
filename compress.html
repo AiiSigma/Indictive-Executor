@@ -1196,14 +1196,14 @@ async function startCompress() {
     // Show download button
     const dlBtn = document.getElementById('btnDownload');
     dlBtn.classList.add('show');
-    document.getElementById('btnDownloadText').textContent = 'Download (' + formatSize(compressedSize) + ')';
+    document.getElementById('btnDownloadText').textContent = 'Save File (' + formatSize(compressedSize) + ')';
 
     // Hide compress button
     btn.classList.remove('show');
     btn.disabled = false;
     btn.querySelector('span').textContent = 'Compress ZIP';
 
-    showToast('success', 'Compress Berhasil', 'File berhasil di-compress! Tap Download untuk menyimpan.');
+    showToast('success', 'Compress Berhasil', 'Tap "Save File" untuk menyimpan hasil compress.');
 
   } catch (err) {
     console.error(err);
@@ -1214,7 +1214,7 @@ async function startCompress() {
   }
 }
 
-// ── Download with Full Feedback ──
+// ── Download with Web Share API (works in Telegram WebView) ──
 async function downloadZip() {
   if (!compressedBlob) {
     showToast('error', 'Error', 'Tidak ada file yang siap di-download');
@@ -1225,94 +1225,113 @@ async function downloadZip() {
   const overlay = document.getElementById('downloadOverlay');
   const dlContent = document.getElementById('dlContent');
 
-  // Disable button, show downloading state
+  // Disable button, show preparing state
   btn.classList.add('downloading');
   btn.disabled = true;
-  document.getElementById('btnDownloadText').textContent = 'Preparing Download...';
+  document.getElementById('btnDownloadText').textContent = 'Preparing...';
 
   // Show overlay with spinner
   overlay.classList.add('show');
   dlContent.innerHTML =
     '<div class="dl-spinner"></div>' +
-    '<div class="dl-title">Preparing Download</div>' +
-    '<div class="dl-subtitle">Membuat file untuk di-download...</div>';
+    '<div class="dl-title">Preparing File</div>' +
+    '<div class="dl-subtitle">Membuat file untuk disimpan...</div>';
 
-  // Small delay to let UI render
-  await new Promise(function(r) { setTimeout(r, 600); });
+  await new Promise(function(r) { setTimeout(r, 400); });
+
+  // Create File object from blob
+  var file = new File([compressedBlob], compressedFileName, { type: 'application/zip' });
 
   try {
-    // Method 1: Try opening in new window (works better in some WebViews)
-    const url = URL.createObjectURL(compressedBlob);
+    // ═══ METHOD 1: Web Share API (most reliable in Telegram WebView) ═══
+    // This opens the native Android share sheet — user can "Save to Files"
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      dlContent.innerHTML =
+        '<div class="dl-spinner"></div>' +
+        '<div class="dl-title">Pilih Tujuan Simpan</div>' +
+        '<div class="dl-subtitle">Share sheet akan muncul.<br>Pilih "Save to Files" atau "Files" untuk menyimpan.</div>';
 
-    // Try using the Telegram WebApp API if available
-    let downloadSuccess = false;
+      await navigator.share({
+        files: [file],
+        title: compressedFileName,
+      });
 
-    if (window.Telegram && window.Telegram.WebApp) {
-      try {
-        // In Telegram Mini App, try openLink which can handle downloads
-        window.Telegram.WebApp.openLink(url);
-        downloadSuccess = true;
-      } catch(e) {
-        // Fallback below
-      }
+      // User completed the share (saved the file)
+      dlContent.innerHTML =
+        '<div class="dl-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+        '<div class="dl-title">File Tersimpan</div>' +
+        '<div class="dl-subtitle">File sudah disimpan ke lokasi yang kamu pilih.</div>' +
+        '<div class="dl-size">' + compressedFileName + ' &mdash; ' + formatSize(compressedSize) + '</div>' +
+        '<button class="dl-close-btn" onclick="closeDownloadOverlay()">Tutup</button>';
+
+      btn.classList.remove('downloading');
+      btn.classList.add('downloaded');
+      document.getElementById('btnDownloadText').textContent = 'Saved';
+      showToast('success', 'Berhasil!', 'File sudah disimpan');
+      return;
     }
 
-    if (!downloadSuccess) {
-      // Standard blob download approach
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = compressedFileName;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
+    // ═══ METHOD 2: Fallback — standard blob download ═══
+    // Only reaches here if Web Share API is not available
+    dlContent.innerHTML =
+      '<div class="dl-spinner"></div>' +
+      '<div class="dl-title">Downloading...</div>' +
+      '<div class="dl-subtitle">Menyimpan file ke Downloads...</div>';
 
-      // Wait a moment before cleanup
-      await new Promise(function(r) { setTimeout(r, 1500); });
-      document.body.removeChild(a);
-    }
+    var url = URL.createObjectURL(compressedBlob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = compressedFileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
 
-    // Keep URL alive a bit longer
-    setTimeout(function() {
-      URL.revokeObjectURL(url);
-    }, 30000);
+    await new Promise(function(r) { setTimeout(r, 2000); });
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
 
-    // Show success in overlay
     dlContent.innerHTML =
       '<div class="dl-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
       '<div class="dl-title">Download Started</div>' +
-      '<div class="dl-subtitle">File sedang di-download ke perangkat kamu.<br>Cek notifikasi download atau folder Downloads.</div>' +
+      '<div class="dl-subtitle">Cek folder Downloads di perangkat kamu.</div>' +
       '<div class="dl-size">' + compressedFileName + ' &mdash; ' + formatSize(compressedSize) + '</div>' +
       '<button class="dl-close-btn" onclick="closeDownloadOverlay()">Tutup</button>';
 
-    // Update button
     btn.classList.remove('downloading');
     btn.classList.add('downloaded');
     document.getElementById('btnDownloadText').textContent = 'Downloaded';
-
-    showToast('success', 'Download Started', 'Cek folder Downloads di perangkat kamu', 4000);
+    showToast('success', 'Download Started', 'Cek folder Downloads');
 
   } catch (err) {
-    // Show error in overlay
+    // User cancelled the share sheet = not an error, just dismiss
+    if (err.name === 'AbortError') {
+      overlay.classList.remove('show');
+      btn.classList.remove('downloading');
+      btn.disabled = false;
+      document.getElementById('btnDownloadText').textContent = 'Save File (' + formatSize(compressedSize) + ')';
+      return;
+    }
+
+    // Real error
     dlContent.innerHTML =
       '<div class="dl-check" style="background: var(--danger-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>' +
-      '<div class="dl-title">Download Gagal</div>' +
-      '<div class="dl-subtitle">' + err.message + '<br><br>Coba tap tombol download sekali lagi.</div>' +
+      '<div class="dl-title">Gagal Menyimpan</div>' +
+      '<div class="dl-subtitle">' + err.message + '</div>' +
       '<button class="dl-close-btn" onclick="closeDownloadOverlay()">Tutup</button>';
 
     btn.classList.remove('downloading');
     btn.disabled = false;
-    document.getElementById('btnDownloadText').textContent = 'Download (' + formatSize(compressedSize) + ')';
-
-    showToast('error', 'Download Failed', err.message);
+    document.getElementById('btnDownloadText').textContent = 'Save File (' + formatSize(compressedSize) + ')';
+    showToast('error', 'Gagal', err.message);
   }
 }
 
 function closeDownloadOverlay() {
   document.getElementById('downloadOverlay').classList.remove('show');
-  const btn = document.getElementById('btnDownload');
+  var btn = document.getElementById('btnDownload');
   btn.classList.remove('downloaded');
   btn.disabled = false;
-  document.getElementById('btnDownloadText').textContent = 'Download Lagi (' + formatSize(compressedSize) + ')';
+  document.getElementById('btnDownloadText').textContent = 'Save File Lagi (' + formatSize(compressedSize) + ')';
 }
 
 // ── Helpers ──

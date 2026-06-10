@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ZIP Compress — Flutter Build Bot</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -16,6 +17,7 @@
   --accent-glow:rgba(15,240,179,0.3);
   --danger:#ff4f6d;--danger-dim:rgba(255,79,109,0.1);
   --warn:#ffb347;--warn-dim:rgba(255,179,71,0.1);
+  --info:#5eaeff;--info-dim:rgba(94,174,255,0.1);
   --success:#0ff0b3;
   --text:#e8edf3;--text2:#8899aa;--text3:#4a5e72;
   --r:16px;--r2:12px;--r3:8px;
@@ -28,9 +30,8 @@ body{
 }
 body::before{
   content:'';position:fixed;inset:0;
-  background:
-    radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);
+  background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),
+  radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);
   pointer-events:none;z-index:0;
 }
 .wrap{position:relative;z-index:1;padding:0 16px 140px;max-width:460px;margin:0 auto}
@@ -66,8 +67,7 @@ body::before{
 .upload-area.has-file .upload-glow{opacity:1}
 .upload-icon{
   width:52px;height:52px;margin:0 auto 14px;border-radius:14px;background:var(--card2);
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.3s;position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;transition:all 0.3s;position:relative;z-index:1;
 }
 .upload-icon svg{width:22px;height:22px;color:var(--text3);transition:all 0.3s}
 .upload-area.has-file .upload-icon{background:var(--accent-dim)}
@@ -125,7 +125,7 @@ body::before{
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px 8px;text-align:center}
 .stat-num{font-size:18px;font-weight:700;font-family:var(--mono)}
 .stat-num.cn{color:var(--accent)}.stat-num.cr{color:var(--danger)}
-.stat-num.cb{color:#5eaeff}.stat-num.co{color:var(--warn)}
+.stat-num.cb{color:var(--info)}.stat-num.co{color:var(--warn)}
 .stat-lbl{font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
 .progress-box{
   display:none;margin-top:14px;
@@ -183,6 +183,27 @@ body::before{
 .btn-share:active{box-shadow:0 2px 10px rgba(15,240,179,0.2)}
 .btn-share.busy{background:var(--card2);color:var(--text2);box-shadow:none}
 .btn-share.done{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff}
+
+/* ═══ Recovery Banner ═══ */
+.recover-banner{
+  display:none;margin-top:14px;
+  background:linear-gradient(135deg,rgba(15,240,179,0.08),rgba(6,201,142,0.04));
+  border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);
+  padding:18px 16px;text-align:center;
+}
+.recover-banner.show{display:block}
+.recover-icon{font-size:28px;margin-bottom:8px}
+.recover-title{font-size:15px;font-weight:700;color:var(--accent)}
+.recover-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5}
+.recover-btn{
+  margin-top:12px;padding:12px 24px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;
+  border:none;border-radius:var(--r3);font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;
+}
+.recover-btn:active{transform:scale(0.97)}
+
+/* ═══ Toast ═══ */
 .toast-wrap{position:fixed;top:12px;left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .toast{
   background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);
@@ -195,73 +216,108 @@ body::before{
 .toast-ic svg{width:14px;height:14px}
 .toast-ic.ok{background:var(--accent-dim)}.toast-ic.ok svg{color:var(--accent)}
 .toast-ic.err{background:var(--danger-dim)}.toast-ic.err svg{color:var(--danger)}
-.toast-ic.inf{background:rgba(94,174,255,0.1)}.toast-ic.inf svg{color:#5eaeff}
+.toast-ic.inf{background:var(--info-dim)}.toast-ic.inf svg{color:var(--info)}
 .toast-ic.wrn{background:var(--warn-dim)}.toast-ic.wrn svg{color:var(--warn)}
 .toast-body{flex:1;min-width:0}
 .toast-t{font-size:12px;font-weight:600}
 .toast-m{font-size:10px;color:var(--text2);margin-top:1px}
 .toast-bar{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);animation:tBar 3s linear forwards}
 .toast-bar.ok{background:var(--accent)}.toast-bar.err{background:var(--danger)}
-.toast-bar.inf{background:#5eaeff}.toast-bar.wrn{background:var(--warn)}
+.toast-bar.inf{background:var(--info)}.toast-bar.wrn{background:var(--warn)}
 @keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes tOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-16px) scale(0.96)}}
 @keyframes tBar{from{width:100%}to{width:0%}}
+
+/* ═══ Save Overlay ═══ */
 .save-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(8,12,16,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  z-index:500;align-items:center;justify-content:center;padding:24px;
+  background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  z-index:500;align-items:flex-end;justify-content:center;
 }
 .save-overlay.show{display:flex}
-.save-card{
+.save-sheet{
+  background:var(--bg2);border-top:1px solid var(--border);
+  border-radius:20px 20px 0 0;padding:12px 16px 28px;
+  width:100%;max-width:460px;
+  animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.save-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.save-sheet-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
+.save-fileinfo{
+  text-align:center;font-family:var(--mono);font-size:11px;color:var(--accent);
+  padding:6px 14px;background:var(--accent-dim);border-radius:6px;display:inline-block;
+  margin:0 auto 16px;word-break:break-all;
+}
+.save-fileinfo-wrap{text-align:center;margin-bottom:16px}
+.save-methods{display:flex;flex-direction:column;gap:8px}
+.save-mbtn{
+  padding:14px 16px;border:1px solid var(--border);border-radius:var(--r2);
+  background:var(--card);color:var(--text);font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;display:flex;
+  align-items:center;gap:12px;transition:all 0.2s;text-align:left;
+  text-decoration:none;
+}
+.save-mbtn:active{transform:scale(0.98);background:var(--card2)}
+.save-mbtn svg{width:20px;height:20px;flex-shrink:0}
+.save-mbtn-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.save-mbtn-icon svg{width:20px;height:20px}
+.save-mbtn-body{flex:1;min-width:0}
+.save-mbtn-name{font-size:13px;font-weight:600;display:block}
+.save-mbtn-desc{font-size:10px;color:var(--text3);margin-top:2px;display:block;line-height:1.4}
+.save-mbtn.primary{border-color:rgba(15,240,179,0.3);background:var(--accent-dim)}
+.save-mbtn.primary .save-mbtn-icon{background:var(--accent-mid)}
+.save-mbtn.primary .save-mbtn-icon svg{color:var(--accent)}
+.save-mbtn.secondary .save-mbtn-icon{background:var(--card2)}
+.save-mbtn.secondary .save-mbtn-icon svg{color:var(--text2)}
+.save-mbtn.tg .save-mbtn-icon{background:rgba(94,174,255,0.12)}
+.save-mbtn.tg .save-mbtn-icon svg{color:var(--info)}
+.save-cancel{
+  margin-top:12px;width:100%;padding:12px;
+  background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);
+  color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);
+}
+.save-cancel:active{background:var(--border)}
+
+/* ═══ Processing overlay ═══ */
+.proc-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  z-index:600;align-items:center;justify-content:center;padding:32px;
+}
+.proc-overlay.show{display:flex}
+.proc-card{
   background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:28px 20px;text-align:center;max-width:320px;width:100%;
+  padding:36px 24px;text-align:center;max-width:280px;width:100%;
   animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);
 }
-.save-spinner{width:44px;height:44px;margin:0 auto 14px;position:relative}
-.save-spinner::before{content:'';position:absolute;inset:0;border:3px solid var(--card2);border-radius:50%}
-.save-spinner::after{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+.proc-spinner{width:44px;height:44px;margin:0 auto 14px;position:relative}
+.proc-spinner::before{content:'';position:absolute;inset:0;border:3px solid var(--card2);border-radius:50%}
+.proc-spinner::after{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.save-ok{
+.proc-ok{
   width:48px;height:48px;margin:0 auto 14px;background:var(--accent-dim);border-radius:50%;
   display:flex;align-items:center;justify-content:center;animation:tIn 0.4s cubic-bezier(0.16,1,0.3,1);
 }
-.save-ok svg{width:24px;height:24px;color:var(--accent)}
-.save-ok.fail{background:var(--danger-dim)}.save-ok.fail svg{color:var(--danger)}
-.save-title{font-size:15px;font-weight:700}
-.save-sub{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
-.save-filename{
-  font-family:var(--mono);font-size:11px;color:var(--accent);
-  margin-top:10px;padding:6px 12px;background:var(--accent-dim);
-  border-radius:6px;display:inline-block;word-break:break-all;
-}
-.save-methods{margin-top:16px;display:flex;flex-direction:column;gap:8px}
-.save-mbtn{
-  padding:13px 16px;border:1px solid var(--border);border-radius:var(--r3);
-  background:var(--card2);color:var(--text);font-family:var(--font);
-  font-size:12px;font-weight:600;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:8px;transition:all 0.2s;
-  text-align:left;
-}
-.save-mbtn:active{transform:scale(0.97);background:var(--border)}
-.save-mbtn svg{width:16px;height:16px;flex-shrink:0}
-.save-mbtn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;border-color:transparent}
-.save-mbtn.primary:active{background:var(--accent2)}
-.save-mbtn-desc{font-size:9px;font-weight:400;opacity:0.7;display:block;margin-top:2px}
-.save-close{
-  margin-top:14px;padding:9px 24px;
+.proc-ok svg{width:24px;height:24px;color:var(--accent)}
+.proc-title{font-size:15px;font-weight:700}
+.proc-sub{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
+.proc-close{
+  margin-top:18px;padding:9px 24px;
   background:var(--card2);border:1px solid var(--border);border-radius:var(--r3);
-  color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.2s;
+  color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);
 }
-.save-close:active{background:var(--border);transform:scale(0.97)}
+.proc-close:active{background:var(--border)}
+
 .bottom-bar{
   position:fixed;bottom:0;left:0;right:0;
   background:var(--bg2);border-top:1px solid var(--border);
   padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:10;
 }
-.bottom-icon{
-  width:28px;height:28px;background:var(--accent-dim);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
+.bottom-icon{width:28px;height:28px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .bottom-icon svg{width:13px;height:13px;color:var(--accent2)}
 .bottom-text{font-size:10px;color:var(--text2);line-height:1.5}
 #fileInput{display:none}
@@ -275,7 +331,8 @@ body::before{
 
 <input type="file" id="fileInput" accept=".zip">
 <div class="toast-wrap" id="toastWrap"></div>
-<div class="save-overlay" id="saveOverlay"><div class="save-card" id="saveCard"></div></div>
+<div class="save-overlay" id="saveOverlay"><div class="save-sheet" id="saveSheet"></div></div>
+<div class="proc-overlay" id="procOverlay"><div class="proc-card" id="procCard"></div></div>
 
 <div class="wrap">
   <div class="navbar">
@@ -285,7 +342,15 @@ body::before{
       </div>
       <div><div class="navbar-title">ZIP Compress</div><div class="navbar-sub">Flutter Build Bot</div></div>
     </div>
-    <div class="navbar-badge">v2.1</div>
+    <div class="navbar-badge">v2.2</div>
+  </div>
+
+  <!-- Recovery Banner: muncul kalau ada file tersimpan dari sesi sebelumnya -->
+  <div class="recover-banner" id="recoverBanner">
+    <div class="recover-icon">&#x1F4E6;</div>
+    <div class="recover-title">File Compress Tersedia</div>
+    <div class="recover-sub" id="recoverSub">Kamu punya file hasil compress dari sesi sebelumnya</div>
+    <button class="recover-btn" id="recoverBtn" onclick="recoverCached()">Lihat & Simpan File</button>
   </div>
 
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
@@ -362,7 +427,7 @@ body::before{
     <span>Compress ZIP</span>
   </button>
 
-  <button class="act-btn btn-share" id="btnShare" onclick="openSaveDialog()">
+  <button class="act-btn btn-share" id="btnShare" onclick="openSaveSheet()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     <span id="btnShareText">Save File</span>
   </button>
@@ -393,10 +458,81 @@ var SKIP_PATTERNS=[
 var SKIP_EXT=['.iml','.class'];
 var MAX_FILE=50*1024*1024;
 var origZip=null,origSize=0,compBlob=null,compSize=0,compName='',analysis=null;
+var blobUrl=null;
 
-/* ═══ Deteksi environment ═══ */
+/* ═══ Deteksi Environment ═══ */
 var isTelegram=!!(window.Telegram&&window.Telegram.WebApp);
 var tgApp=isTelegram?window.Telegram.WebApp:null;
+if(tgApp){try{tgApp.ready()}catch(e){}}
+
+/* ═══ Cache Storage — simpan file antar sesi ═══ */
+var CACHE_NAME='zip-compress-v1';
+var CACHE_KEY='/compressed-result';
+
+async function cacheCompressedBlob(blob,name,size,origSz){
+  try{
+    var cache=await caches.open(CACHE_NAME);
+    var resp=new Response(blob,{headers:{
+      'Content-Type':'application/zip',
+      'X-Filename':name,
+      'X-Size':String(size),
+      'X-Original-Size':String(origSz)
+    }});
+    await cache.put(CACHE_KEY,resp);
+  }catch(e){console.warn('Cache write failed:',e)}
+}
+
+async function getCachedCompressed(){
+  try{
+    var cache=await caches.open(CACHE_NAME);
+    var resp=await cache.match(CACHE_KEY);
+    if(!resp)return null;
+    return{
+      blob:await resp.blob(),
+      name:resp.headers.get('X-Filename')||'project-clean.zip',
+      size:parseInt(resp.headers.get('X-Size')||'0'),
+      origSize:parseInt(resp.headers.get('X-Original-Size')||'0')
+    };
+  }catch(e){console.warn('Cache read failed:',e);return null}
+}
+
+async function clearCachedCompressed(){
+  try{var cache=await caches.open(CACHE_NAME);await cache.delete(CACHE_KEY)}catch(e){}
+}
+
+/* ═══ Cek cache saat pertama kali load ═══ */
+(async function(){
+  var cached=await getCachedCompressed();
+  if(cached&&cached.blob&&cached.blob.size>0){
+    compBlob=cached.blob;compSize=cached.size;compName=cached.name;origSize=cached.origSize;
+    var banner=document.getElementById('recoverBanner');
+    banner.classList.add('show');
+    document.getElementById('recoverSub').textContent=
+      compName+' ('+fmtSize(compSize)+') — dari sesi sebelumnya';
+  }
+})();
+
+/* Recovery: tampilkan hasil compress dari cache */
+function recoverCached(){
+  var banner=document.getElementById('recoverBanner');banner.classList.remove('show');
+
+  /* Tampilkan result card */
+  var saved=origSize-compSize;
+  var savedPct=origSize>0?Math.round((saved/origSize)*100):0;
+  document.getElementById('resultBox').classList.add('show');
+  document.getElementById('resultP').textContent='File sudah di-compress sebelumnya';
+  var rs=document.getElementById('resultSave');
+  if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}
+  else{rs.textContent='Siap disimpan';rs.className='result-save muted'}
+
+  document.getElementById('sCompressed').textContent=fmtSize(compSize);
+
+  /* Tampilkan tombol save */
+  var sb=document.getElementById('btnShare');sb.classList.add('show');
+  document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
+
+  toast('ok','File Ditemukan','Hasil compress sebelumnya tersedia. Tap Save untuk menyimpan.');
+}
 
 /* ═══ TOAST ═══ */
 function toast(type,title,msg,dur){
@@ -515,6 +651,10 @@ async function startCompress(){
     document.getElementById('resultP').textContent=kept+' files kept, '+skipped+' files removed';
     var rs=document.getElementById('resultSave');
     if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
+
+    /* Simpan ke Cache Storage biar bisa di-recover */
+    await cacheCompressedBlob(compBlob,compName,compSize,origSize);
+
     var sb=document.getElementById('btnShare');sb.classList.add('show');
     document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
     btn.classList.remove('show');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';
@@ -522,122 +662,131 @@ async function startCompress(){
   }catch(err){console.error(err);setProgress(0,'Error');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';toast('err','Failed',err.message,5000)}
 }
 
-/* ═══════════════════════════════════════════════════
-   SAVE DIALOG — Semua Metode
-   ═══════════════════════════════════════════════════ */
-function openSaveDialog(){
+/* ═══════════════════════════════════════════════════════
+   SAVE SHEET — Bottom Sheet dengan semua metode
+   ═══════════════════════════════════════════════════════ */
+function openSaveSheet(){
   if(!compBlob){toast('err','Error','Tidak ada file');return}
-  showMethodPicker();
-}
 
-/* Tampilkan daftar semua metode simpan yang tersedia */
-function showMethodPicker(){
+  /* Buat blob URL sekali, dipakai semua metode */
+  if(blobUrl)URL.revokeObjectURL(blobUrl);
+  blobUrl=URL.createObjectURL(compBlob);
+
+  var sheet=document.getElementById('saveSheet');
   var overlay=document.getElementById('saveOverlay');
-  var card=document.getElementById('saveCard');
   overlay.classList.add('show');
 
-  var h='<div class="save-title">Simpan File</div>';
-  h+='<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>';
+  var h='<div class="save-handle"></div>';
+  h+='<div class="save-sheet-title">Simpan File</div>';
+  h+='<div class="save-fileinfo-wrap"><div class="save-fileinfo">'+compName+' &mdash; '+fmtSize(compSize)+'</div></div>';
   h+='<div class="save-methods">';
 
-  /* Metode 1: Web Share API — coba walau canShare false */
-  h+='<button class="save-mbtn primary" onclick="tryShare()">';
-  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
-  h+='<span>Share & Save<span class="save-mbtn-desc">Buka share sheet → pilih Save to Files</span></span></button>';
+  /* ═══ METODE 1: Download Link — <a> tag asli yang user tap langsung ═══ */
+  h+='<a class="save-mbtn primary" href="'+blobUrl+'" download="'+compName+'" onclick="onDirectDownload(this,event)">';
+  h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>';
+  h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Tap to Download</span><span class="save-mbtn-desc">Tap langsung di sini untuk download. Kalau tidak berfungsi, long-press dan pilih "Save link".</span></div>';
+  h+='</a>';
 
-  /* Metode 2: Buka di Browser External — khusus Telegram */
+  /* ═══ METODE 2: Buka di Browser External (khusus Telegram) ═══ */
   if(isTelegram){
-    h+='<button class="save-mbtn primary" onclick="tryTelegramBrowser()">';
-    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-    h+='<span>Open in Browser<span class="save-mbtn-desc">Buka di Chrome → lalu tap Save File</span></span></button>';
+    h+='<button class="save-mbtn tg" onclick="openInExternalBrowser()">';
+    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Open in Browser</span><span class="save-mbtn-desc">Buka halaman ini di Chrome. File hasil compress akan otomatis tersedia di sana (tidak perlu compress ulang).</span></div>';
+    h+='</button>';
   }
 
-  /* Metode 3: showSaveFilePicker — desktop Chrome */
+  /* ═══ METODE 3: Web Share API ═══ */
+  if(navigator.share){
+    h+='<button class="save-mbtn secondary" onclick="tryWebShare()">';
+    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Share File</span><span class="save-mbtn-desc">Buka share sheet — pilih "Save to Files" untuk simpan ke perangkat.</span></div>';
+    h+='</button>';
+  }
+
+  /* ═══ METODE 4: Save As Picker (desktop Chrome) ═══ */
   if(window.showSaveFilePicker){
-    h+='<button class="save-mbtn" onclick="tryPicker()">';
-    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
-    h+='<span>Pilih Lokasi Simpan<span class="save-mbtn-desc">Pilih folder tujuan (Chrome desktop)</span></span></button>';
+    h+='<button class="save-mbtn secondary" onclick="trySaveAs()">';
+    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>';
+    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Save As...</span><span class="save-mbtn-desc">Pilih lokasi folder penyimpanan (Chrome desktop).</span></div>';
+    h+='</button>';
   }
 
-  /* Metode 4: Download langsung */
-  h+='<button class="save-mbtn" onclick="tryDownload()">';
-  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-  h+='<span>Download Langsung<span class="save-mbtn-desc">Simpan ke folder Downloads</span></span></button>';
-
-  h+='</div>';
-  h+='<button class="save-close" onclick="closeSave()">Batal</button>';
-  card.innerHTML=h;
+  h+='</div>';/* end save-methods */
+  h+='<button class="save-cancel" onclick="closeSaveSheet()">Batal</button>';
+  sheet.innerHTML=h;
 }
 
-/* ═══ METODE 1: Web Share API ═══ */
-async function tryShare(){
-  var card=document.getElementById('saveCard');
-  var btn=document.getElementById('btnShare');
-  setBtnBusy(btn);
-
-  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Membuka Share Sheet...</div><div class="save-sub">Pilih "Save to Files" / "Simpan ke File"<br>untuk menyimpan ke perangkat.</div>';
-
-  var file=new File([compBlob],compName,{type:'application/zip'});
-
-  try{
-    /* Coba share walau canShare return false */
-    if(navigator.share){
-      await navigator.share({files:[file],title:compName});
-      showDone(card,'File Tersimpan','File sudah disimpan ke lokasi yang kamu pilih.');
-      setBtnDone(btn);toast('ok','Berhasil!','File disimpan');
-      return;
-    }
-  }catch(err){
-    if(err.name==='AbortError'){closeSave();resetBtn(btn);return}
-    /* Gagal — kembali ke pilihan metode */
-    toast('wrn','Share Gagal',err.message||'Tidak didukung di environment ini');
-  }
-
-  /* Share gagal/tidak tersedia, tampilkan metode lain */
-  resetBtn(btn);
-  showMethodPickerFallback();
+/* ═══ METODE 1: Direct Download — user tap <a> langsung ═══ */
+function onDirectDownload(el,e){
+  /* Biarkan browser handle download secara native.
+     Jika di WebView download diblokir, long-press akan jadi fallback. */
+  setTimeout(function(){
+    toast('ok','Download','Jika file tidak muncul di Downloads, coba long-press tombol hijau di atas lalu pilih "Save link".');
+  },1000);
 }
 
 /* ═══ METODE 2: Buka di External Browser via Telegram API ═══ */
-async function tryTelegramBrowser(){
-  var card=document.getElementById('saveCard');
-  var btn=document.getElementById('btnShare');
-  setBtnBusy(btn);
+async function openInExternalBrowser(){
+  var sheet=document.getElementById('saveSheet');
 
-  /* Simpan blob ke URL */
-  var url=URL.createObjectURL(compBlob);
+  /* Simpan dulu ke Cache Storage */
+  await cacheCompressedBlob(compBlob,compName,compSize,origSize);
 
-  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Membuka Browser...</div><div class="save-sub">File akan terbuka di browser external.<br>Di sana, tap dan hold lalu "Download".</div>';
+  /* Tampilkan panduan */
+  sheet.innerHTML=
+    '<div class="save-handle"></div>'+
+    '<div class="save-sheet-title">Buka di Browser</div>'+
+    '<div style="padding:16px;text-align:center">'+
+      '<div style="font-size:13px;color:var(--text2);line-height:1.7;text-align:left;margin-bottom:16px">'+
+        '<div style="font-weight:600;color:var(--info);margin-bottom:8px">Ikuti langkah ini:</div>'+
+        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
+          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>'+
+          '<span>Tap tombol di bawah untuk buka halaman ini di Chrome</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
+          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>'+
+          '<span>Di Chrome, akan muncul banner "File Compress Tersedia"</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">'+
+          '<div style="width:22px;height:22px;border-radius:50%;background:var(--info-dim);color:var(--info);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>'+
+          '<span>Tap "Lihat & Simpan File" lalu pilih download</span>'+
+        '</div>'+
+      '</div>'+
+      '<button class="save-mbtn tg" onclick="doOpenBrowser()" style="width:100%">'+
+        '<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>'+
+        '<div class="save-mbtn-body"><span class="save-mbtn-name">Buka di Chrome Sekarang</span><span class="save-mbtn-desc">File compress akan otomatis tersedia di sana</span></div>'+
+      '</button>'+
+      '<button class="save-cancel" onclick="openSaveSheet()" style="margin-top:8px">Kembali</button>'+
+    '</div>';
+}
 
-  await new Promise(function(r){setTimeout(r,500)});
+async function doOpenBrowser(){
+  /* Buka halaman ini di external browser via Telegram API */
+  var pageUrl=window.location.href;
+  if(tgApp&&tgApp.openLink){
+    tgApp.openLink(pageUrl);
+  }else{
+    window.open(pageUrl,'_blank');
+  }
+  closeSaveSheet();
+  toast('inf','Browser Dibuka','Cari banner "File Compress Tersedia" di Chrome');
+}
 
+/* ═══ METODE 3: Web Share API ═══ */
+async function tryWebShare(){
+  var file=new File([compBlob],compName,{type:'application/zip'});
   try{
-    if(tgApp&&tgApp.openLink){
-      /* Pakai Telegram WebApp API buat buka di external browser */
-      tgApp.openLink(url);
-    }else if(window.open){
-      window.open(url,'_blank');
-    }
-
-    await new Promise(function(r){setTimeout(r,1500)});
-
-    showDone(card,'Browser Dibuka','File terbuka di browser external.<br>Tap dan hold pada file, lalu pilih "Download" atau "Save".');
-    setBtnDone(btn);toast('ok','Browser Dibuka','Download file dari browser');
+    await navigator.share({files:[file],title:compName});
+    toast('ok','Berhasil!','File sudah di-share/disimpan');
+    closeSaveSheet();
   }catch(err){
-    toast('wrn','Gagal Membuka Browser',err.message);
-    resetBtn(btn);
-    showMethodPickerFallback();
+    if(err.name==='AbortError')return;
+    toast('wrn','Share Gagal',err.message||'Tidak didukung');
   }
 }
 
-/* ═══ METODE 3: File System Access API (showSaveFilePicker) ═══ */
-async function tryPicker(){
-  var card=document.getElementById('saveCard');
-  var btn=document.getElementById('btnShare');
-  setBtnBusy(btn);
-
-  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Memilih Lokasi...</div><div class="save-sub">Dialog "Save As" akan muncul.<br>Pilih folder tujuan penyimpanan.</div>';
-
+/* ═══ METODE 4: Save As Picker ═══ */
+async function trySaveAs(){
   try{
     var handle=await window.showSaveFilePicker({
       suggestedName:compName,
@@ -646,74 +795,20 @@ async function tryPicker(){
     var writable=await handle.createWritable();
     await writable.write(compBlob);
     await writable.close();
-    showDone(card,'File Tersimpan','File berhasil disimpan ke lokasi yang kamu pilih.');
-    setBtnDone(btn);toast('ok','Berhasil!','File disimpan');
+    toast('ok','Berhasil!','File disimpan ke lokasi yang dipilih');
+    closeSaveSheet();
   }catch(err){
-    if(err.name==='AbortError'){closeSave();resetBtn(btn);return}
+    if(err.name==='AbortError')return;
     toast('wrn','Save Gagal',err.message);
-    resetBtn(btn);showMethodPickerFallback();
   }
 }
 
-/* ═══ METODE 4: Download Langsung ═══ */
-async function tryDownload(){
-  var card=document.getElementById('saveCard');
-  var btn=document.getElementById('btnShare');
-  setBtnBusy(btn);
-
-  card.innerHTML='<div class="save-spinner"></div><div class="save-title">Downloading...</div><div class="save-sub">File sedang diunduh.<br>Cek folder Downloads di perangkat.</div>';
-
-  var url=URL.createObjectURL(compBlob);
-  var a=document.createElement('a');a.href=url;a.download=compName;a.style.display='none';
-  document.body.appendChild(a);a.click();
-  await new Promise(function(r){setTimeout(r,1500)});
-  document.body.removeChild(a);
-  setTimeout(function(){URL.revokeObjectURL(url)},30000);
-
-  showDone(card,'Download Dimulai','Cek folder Downloads di perangkat kamu.');
-  setBtnDone(btn);toast('ok','Download Started','Cek folder Downloads');
+/* ═══ Close ═══ */
+function closeSaveSheet(){
+  document.getElementById('saveOverlay').classList.remove('show');
 }
 
-/* ═══ Fallback picker — tanpa opsi yang udah dicoba & gagal ═══ */
-function showMethodPickerFallback(){
-  var card=document.getElementById('saveCard');
-  var h='<div class="save-title">Coba Metode Lain</div>';
-  h+='<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>';
-  h+='<div class="save-methods">';
-
-  if(isTelegram){
-    h+='<button class="save-mbtn primary" onclick="tryTelegramBrowser()">';
-    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-    h+='<span>Open in Browser<span class="save-mbtn-desc">Buka di Chrome → lalu download</span></span></button>';
-  }
-
-  if(window.showSaveFilePicker){
-    h+='<button class="save-mbtn" onclick="tryPicker()">';
-    h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
-    h+='<span>Pilih Lokasi Simpan<span class="save-mbtn-desc">Save As dialog</span></span></button>';
-  }
-
-  h+='<button class="save-mbtn" onclick="tryDownload()">';
-  h+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-  h+='<span>Download Langsung<span class="save-mbtn-desc">Simpan ke folder Downloads</span></span></button>';
-
-  h+='</div><button class="save-close" onclick="closeSave()">Batal</button>';
-  card.innerHTML=h;
-}
-
-/* ═══ UI HELPERS ═══ */
-function showDone(card,title,msg){
-  card.innerHTML=
-    '<div class="save-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
-    '<div class="save-title">'+title+'</div>'+
-    '<div class="save-sub">'+msg+'</div>'+
-    '<div class="save-filename">'+compName+' &mdash; '+fmtSize(compSize)+'</div>'+
-    '<button class="save-close" onclick="closeSave()">Tutup</button>';
-}
-function setBtnBusy(btn){btn.classList.add('busy');btn.disabled=true;document.getElementById('btnShareText').textContent='Processing...'}
-function setBtnDone(btn){btn.classList.remove('busy');btn.classList.add('done');document.getElementById('btnShareText').textContent='Saved'}
-function resetBtn(btn){btn.classList.remove('busy','done');btn.disabled=false;document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')'}
-function closeSave(){document.getElementById('saveOverlay').classList.remove('show');var btn=document.getElementById('btnShare');btn.classList.remove('done');btn.disabled=false;document.getElementById('btnShareText').textContent='Save File Lagi ('+fmtSize(compSize)+')'}
+/* ═══ HELPERS ═══ */
 function fmtSize(b){if(b<1024)return b+' B';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(2)+' MB'}
 function setProgress(pct,txt){document.getElementById('progPct').textContent=pct+'%';document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=txt}
 </script>

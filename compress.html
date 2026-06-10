@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Compress ZIP — Flutter Build Bot</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --card2: #16213e;
+    --accent: #00d4ff;
+    --accent2: #7b2ff7;
+    --danger: #ff4757;
+    --success: #2ed573;
+    --warn: #ffa502;
+    --text: #e8e8e8;
+    --text2: #a0a0b8;
+    --radius: 16px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 16px;
+    padding-bottom: 100px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 20px 0 16px;
+  }
+  .header h1 {
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+  .header p {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* Upload Zone */
+  .upload-zone {
+    border: 2px dashed #333;
+    border-radius: var(--radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--card);
+    margin-top: 16px;
+  }
+  .upload-zone:active {
+    border-color: var(--accent);
+    background: rgba(0, 212, 255, 0.05);
+    transform: scale(0.98);
+  }
+  .upload-zone.has-file {
+    border-color: var(--success);
+    background: rgba(46, 213, 115, 0.08);
+  }
+  .upload-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .upload-zone h2 {
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .upload-zone p {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 6px;
+  }
+
+  /* File Info Card */
+  .file-info {
+    display: none;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .file-info.show { display: block; }
+  .file-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+    font-size: 13px;
+  }
+  .file-info-row:last-child { border: none; }
+  .file-info-label { color: var(--text2); }
+  .file-info-value { color: var(--text); font-weight: 600; }
+  .file-info-value.danger { color: var(--danger); }
+  .file-info-value.warn { color: var(--warn); }
+  .file-info-value.success { color: var(--success); }
+
+  /* Skip Patterns (Toggleable) */
+  .patterns-section {
+    display: none;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .patterns-section.show { display: block; }
+  .patterns-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .patterns-header h3 {
+    font-size: 14px;
+    color: var(--accent);
+  }
+  .patterns-toggle {
+    font-size: 12px;
+    color: var(--text2);
+    background: var(--card2);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .patterns-list {
+    display: none;
+    margin-top: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .patterns-list.show { display: flex; }
+  .pattern-tag {
+    font-size: 11px;
+    background: var(--card2);
+    color: var(--text2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #333;
+  }
+  .pattern-tag.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Stats */
+  .stats-grid {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stats-grid.show { display: grid; }
+  .stat-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat-value.green { color: var(--success); }
+  .stat-value.red { color: var(--danger); }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.orange { color: var(--warn); }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* Button */
+  .btn {
+    display: none;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .btn.show { display: block; }
+  .btn:active { transform: scale(0.97); }
+  .btn-compress {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-download {
+    background: linear-gradient(135deg, var(--success), #17c063);
+    color: #fff;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Progress */
+  .progress-section {
+    display: none;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .progress-section.show { display: block; }
+  .progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .progress-pct {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Skipped Files Log */
+  .skipped-log {
+    display: none;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .skipped-log.show { display: block; }
+  .skipped-log h3 {
+    font-size: 13px;
+    color: var(--warn);
+    margin-bottom: 8px;
+  }
+  .skipped-log .log-item {
+    font-size: 11px;
+    color: var(--text2);
+    padding: 3px 0;
+    border-bottom: 1px solid #1a1a1a;
+    word-break: break-all;
+  }
+  .skipped-log .log-item span {
+    color: var(--danger);
+    float: right;
+  }
+
+  /* Result Card */
+  .result-card {
+    display: none;
+    background: linear-gradient(135deg, rgba(46, 213, 115, 0.1), rgba(0, 212, 255, 0.1));
+    border: 1px solid rgba(46, 213, 115, 0.3);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .result-card.show { display: block; }
+  .result-icon { font-size: 40px; margin-bottom: 8px; }
+  .result-title { font-size: 18px; font-weight: 700; color: var(--success); }
+  .result-detail { font-size: 13px; color: var(--text2); margin-top: 6px; }
+  .result-saved {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--warn);
+    margin-top: 8px;
+  }
+
+  /* Floating tip */
+  .tip {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background: var(--card2);
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text2);
+    text-align: center;
+    z-index: 10;
+  }
+
+  /* Hidden file input */
+  #fileInput { display: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<input type="file" id="fileInput" accept=".zip">
+
+<!-- Header -->
+<div class="header">
+  <h1>🧹 ZIP Compressor</h1>
+  <p>Flutter Build Bot — Compress & Clean ZIP</p>
+</div>
+
+<!-- Upload Zone -->
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+  <span class="upload-icon">📦</span>
+  <h2 id="uploadTitle">Tap to upload ZIP</h2>
+  <p id="uploadSubtitle">Project Flutter yang ingin di-compress</p>
+</div>
+
+<!-- File Info -->
+<div class="file-info" id="fileInfo">
+  <div class="file-info-row">
+    <span class="file-info-label">File</span>
+    <span class="file-info-value" id="infoName">—</span>
+  </div>
+  <div class="file-info-row">
+    <span class="file-info-label">Original Size</span>
+    <span class="file-info-value" id="infoSize">—</span>
+  </div>
+  <div class="file-info-row">
+    <span class="file-info-label">Status</span>
+    <span class="file-info-value" id="infoStatus">—</span>
+  </div>
+</div>
+
+<!-- Patterns -->
+<div class="patterns-section" id="patternsSection">
+  <div class="patterns-header" onclick="togglePatterns()">
+    <h3>⚙️ Filter Settings</h3>
+    <button class="patterns-toggle" id="patternsToggle">Show</button>
+  </div>
+  <div class="patterns-list" id="patternsList"></div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" id="statsGrid">
+  <div class="stat-card">
+    <div class="stat-value green" id="statKept">0</div>
+    <div class="stat-label">Files Kept</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value red" id="statSkipped">0</div>
+    <div class="stat-label">Files Removed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value blue" id="statOriginal">0 MB</div>
+    <div class="stat-label">Original</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value orange" id="statCompressed">0 MB</div>
+    <div class="stat-label">After Compress</div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-section" id="progressSection">
+  <div class="progress-pct" id="progressPct">0%</div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <div class="progress-text" id="progressText">Menganalisis file...</div>
+</div>
+
+<!-- Skipped Files Log -->
+<div class="skipped-log" id="skippedLog">
+  <h3>📋 File yang dihapus:</h3>
+  <div id="skippedList"></div>
+</div>
+
+<!-- Result -->
+<div class="result-card" id="resultCard">
+  <div class="result-icon">✅</div>
+  <div class="result-title">Compress Berhasil!</div>
+  <div class="result-detail" id="resultDetail"></div>
+  <div class="result-saved" id="resultSaved"></div>
+</div>
+
+<!-- Buttons -->
+<button class="btn btn-compress" id="btnCompress" onclick="startCompress()">
+  🧹 Compress ZIP
+</button>
+<button class="btn btn-download" id="btnDownload" onclick="downloadZip()">
+  📥 Download Clean ZIP
+</button>
+
+<!-- Tip -->
+<div class="tip" id="tip">
+  💡 Upload ZIP project Flutter → Compress buang file gak penting → Download ZIP bersih → Upload ke bot
+</div>
+
+<script>
+// ── Config ──
+const SKIP_PATTERNS = [
+  { pattern: '.dart_tool/', desc: '.dart_tool/ (Dart cache)', active: true },
+  { pattern: '.gradle/', desc: '.gradle/ (Gradle cache)', active: true },
+  { pattern: '.idea/', desc: '.idea/ (IDE config)', active: true },
+  { pattern: 'build/', desc: 'build/ (Build output)', active: true },
+  { pattern: '.git/', desc: '.git/ (Git data)', active: true },
+  { pattern: 'node_modules/', desc: 'node_modules/', active: true },
+  { pattern: '.DS_Store', desc: '.DS_Store (macOS)', active: true },
+  { pattern: 'ios/Pods/', desc: 'ios/Pods/ (iOS deps)', active: true },
+  { pattern: 'windows/flutter/generated_plugins/', desc: 'Generated plugins', active: true },
+  { pattern: 'linux/flutter/generated_plugins/', desc: 'Generated plugins', active: true },
+  { pattern: '.metadata', desc: '.metadata', active: true },
+];
+
+const SKIP_EXTENSIONS = ['.iml', '.class'];
+const MAX_PER_FILE = 50 * 1024 * 1024; // 50MB per file
+
+let originalZip = null;
+let originalSize = 0;
+let compressedBlob = null;
+let compressedSize = 0;
+let compressedFileName = '';
+let analysisResult = null;
+
+// ── Init Patterns UI ──
+function initPatterns() {
+  const list = document.getElementById('patternsList');
+  SKIP_PATTERNS.forEach((p, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'pattern-tag' + (p.active ? ' active' : '');
+    tag.textContent = p.desc;
+    tag.dataset.index = i;
+    tag.onclick = (e) => {
+      e.stopPropagation();
+      SKIP_PATTERNS[i].active = !SKIP_PATTERNS[i].active;
+      tag.classList.toggle('active');
+    };
+    list.appendChild(tag);
+  });
+}
+initPatterns();
+
+function togglePatterns() {
+  const list = document.getElementById('patternsList');
+  const btn = document.getElementById('patternsToggle');
+  list.classList.toggle('show');
+  btn.textContent = list.classList.contains('show') ? 'Hide' : 'Show';
+}
+
+// ── File Upload ──
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.zip')) {
+    alert('File harus berformat .zip!');
+    return;
+  }
+
+  const zone = document.getElementById('uploadZone');
+  zone.classList.add('has-file');
+  document.getElementById('uploadTitle').textContent = file.name;
+  document.getElementById('uploadSubtitle').textContent = formatSize(file.size);
+
+  // Show file info
+  document.getElementById('fileInfo').classList.add('show');
+  document.getElementById('infoName').textContent = file.name;
+  document.getElementById('infoSize').textContent = formatSize(file.size);
+  document.getElementById('infoStatus').textContent = 'Menganalisis...';
+  document.getElementById('infoStatus').className = 'file-info-value warn';
+
+  // Show patterns
+  document.getElementById('patternsSection').classList.add('show');
+
+  // Read file
+  originalSize = file.size;
+  try {
+    originalZip = await JSZip.loadAsync(file);
+    await analyzeZip();
+  } catch (err) {
+    document.getElementById('infoStatus').textContent = 'Error: ' + err.message;
+    document.getElementById('infoStatus').className = 'file-info-value danger';
+    console.error(err);
+  }
+});
+
+// ── Analyze ──
+async function analyzeZip() {
+  const entries = [];
+  originalZip.forEach((path, entry) => {
+    if (!entry.dir) entries.push({ path, entry });
+  });
+
+  let kept = 0, skipped = 0;
+  const skippedFiles = [];
+
+  for (const { path, entry } of entries) {
+    if (shouldSkip(path)) {
+      skipped++;
+      skippedFiles.push({ path, reason: getSkipReason(path) });
+    } else {
+      kept++;
+    }
+  }
+
+  analysisResult = { kept, skipped, skippedFiles, total: entries.length };
+
+  // Update UI
+  const statusEl = document.getElementById('infoStatus');
+  if (originalSize > 20 * 1024 * 1024) {
+    statusEl.textContent = '⚠️ Perlu di-compress (>20MB)';
+    statusEl.className = 'file-info-value danger';
+  } else if (originalSize > 15 * 1024 * 1024) {
+    statusEl.textContent = 'Dianjurkan compress (>15MB)';
+    statusEl.className = 'file-info-value warn';
+  } else {
+    statusEl.textContent = '✅ Ukuran OK';
+    statusEl.className = 'file-info-value success';
+  }
+
+  // Show stats
+  const grid = document.getElementById('statsGrid');
+  grid.classList.add('show');
+  document.getElementById('statKept').textContent = kept;
+  document.getElementById('statSkipped').textContent = skipped;
+  document.getElementById('statOriginal').textContent = formatSize(originalSize);
+
+  // Show skipped log
+  if (skippedFiles.length > 0) {
+    const logEl = document.getElementById('skippedLog');
+    logEl.classList.add('show');
+    const listEl = document.getElementById('skippedList');
+    listEl.innerHTML = '';
+    skippedFiles.slice(0, 50).forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      item.innerHTML = `${f.path} <span>${f.reason}</span>`;
+      listEl.appendChild(item);
+    });
+    if (skippedFiles.length > 50) {
+      const more = document.createElement('div');
+      more.className = 'log-item';
+      more.textContent = `...dan ${skippedFiles.length - 50} file lainnya`;
+      listEl.appendChild(more);
+    }
+  }
+
+  // Show compress button
+  if (skipped > 0) {
+    document.getElementById('btnCompress').classList.add('show');
+  } else {
+    document.getElementById('infoStatus').textContent = '✅ Sudah bersih, tidak perlu compress';
+    document.getElementById('infoStatus').className = 'file-info-value success';
+  }
+}
+
+// ── Should Skip ──
+function shouldSkip(filePath) {
+  for (const p of SKIP_PATTERNS) {
+    if (!p.active) continue;
+    const pat = p.pattern;
+    if (pat.endsWith('/')) {
+      if (filePath.startsWith(pat) || filePath.split('/').includes(pat.slice(0, -1))) return true;
+    } else {
+      if (filePath === pat || filePath.split('/').includes(pat)) return true;
+    }
+  }
+  // Skip specific extensions
+  const ext = filePath.substring(filePath.lastIndexOf('.'));
+  if (SKIP_EXTENSIONS.includes(ext)) return true;
+  // Skip lock files (except pubspec.lock)
+  if (ext === '.lock' && !filePath.endsWith('pubspec.lock')) return true;
+  // Skip files > 50MB
+  // (We'll check this during compression)
+  return false;
+}
+
+function getSkipReason(path) {
+  for (const p of SKIP_PATTERNS) {
+    if (!p.active) continue;
+    const pat = p.pattern;
+    if (pat.endsWith('/')) {
+      if (path.startsWith(pat) || path.split('/').includes(pat.slice(0, -1))) return p.desc;
+    } else {
+      if (path === pat || path.split('/').includes(pat)) return p.desc;
+    }
+  }
+  const ext = path.substring(path.lastIndexOf('.'));
+  if (SKIP_EXTENSIONS.includes(ext)) return 'Extension ' + ext;
+  if (ext === '.lock' && !path.endsWith('pubspec.lock')) return 'Lock file';
+  return 'Unknown';
+}
+
+// ── Compress ──
+async function startCompress() {
+  if (!originalZip) return;
+
+  const btn = document.getElementById('btnCompress');
+  btn.disabled = true;
+  btn.textContent = '⏳ Compressing...';
+
+  const prog = document.getElementById('progressSection');
+  prog.classList.add('show');
+
+  try {
+    const newZip = new JSZip();
+    const entries = [];
+    originalZip.forEach((path, entry) => {
+      if (!entry.dir) entries.push({ path, entry });
+    });
+
+    let processed = 0;
+    const total = entries.length;
+    let kept = 0, skipped = 0;
+
+    for (const { path, entry } of entries) {
+      const pct = Math.round((processed / total) * 100);
+      updateProgress(pct, `Processing: ${path.split('/').pop()} (${processed + 1}/${total})`);
+
+      if (shouldSkip(path)) {
+        skipped++;
+        processed++;
+        continue;
+      }
+
+      // Get file data
+      const data = await entry.async('arraybuffer');
+
+      // Skip files > 50MB
+      if (data.byteLength > MAX_PER_FILE) {
+        skipped++;
+        processed++;
+        continue;
+      }
+
+      newZip.file(path, data);
+      kept++;
+      processed++;
+
+      // Small delay to allow UI update
+      if (processed % 10 === 0) {
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    updateProgress(90, 'Generating ZIP...');
+
+    compressedBlob = await newZip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 },
+    }, (metadata) => {
+      const pct = 90 + Math.round(metadata.percent / 10);
+      updateProgress(pct, 'Compressing data...');
+    });
+
+    compressedSize = compressedBlob.size;
+    const baseName = originalZip.name || 'project';
+    compressedFileName = baseName.replace(/\.zip$/i, '-clean.zip');
+
+    updateProgress(100, 'Done!');
+
+    // Update stats
+    document.getElementById('statCompressed').textContent = formatSize(compressedSize);
+
+    // Show result
+    const saved = originalSize - compressedSize;
+    const savedPct = Math.round((saved / originalSize) * 100);
+    document.getElementById('resultCard').classList.add('show');
+    document.getElementById('resultDetail').textContent =
+      `${kept} files kept, ${skipped} files removed`;
+    document.getElementById('resultSaved').textContent =
+      saved > 0 ? `Hemat ${formatSize(saved)} (${savedPct}%)` : 'Tidak ada penghematan';
+
+    // Show download button
+    const dlBtn = document.getElementById('btnDownload');
+    dlBtn.classList.add('show');
+    dlBtn.textContent = `📥 Download (${formatSize(compressedSize)})`;
+
+    // Hide compress button
+    btn.classList.remove('show');
+    btn.disabled = false;
+    btn.textContent = '🧹 Compress ZIP';
+
+  } catch (err) {
+    console.error(err);
+    updateProgress(0, 'Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = '🧹 Compress ZIP';
+  }
+}
+
+// ── Download ──
+function downloadZip() {
+  if (!compressedBlob) return;
+  const url = URL.createObjectURL(compressedBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = compressedFileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Helpers ──
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+function updateProgress(pct, text) {
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = text;
+}
+</script>
+
+</body>
+</html>

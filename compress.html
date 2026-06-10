@@ -9,110 +9,212 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg: #0f0f1a;
-    --card: #1a1a2e;
-    --card2: #16213e;
-    --accent: #00d4ff;
-    --accent2: #7b2ff7;
-    --danger: #ff4757;
-    --success: #2ed573;
-    --warn: #ffa502;
-    --text: #e8e8e8;
-    --text2: #a0a0b8;
-    --radius: 16px;
+    --bg: #0a0a12;
+    --surface: #12121e;
+    --surface2: #1a1a2e;
+    --surface3: #222240;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --accent-glow: rgba(108, 92, 231, 0.25);
+    --danger: #ff6b6b;
+    --danger-bg: rgba(255, 107, 107, 0.1);
+    --success: #00cec9;
+    --success-bg: rgba(0, 206, 201, 0.1);
+    --warn: #fdcb6e;
+    --warn-bg: rgba(253, 203, 110, 0.1);
+    --text: #f0f0f5;
+    --text-secondary: #8888a8;
+    --text-muted: #55556a;
+    --border: #2a2a44;
+    --border-light: #3a3a58;
+    --radius-sm: 10px;
+    --radius: 14px;
+    --radius-lg: 18px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 16px;
-    padding-bottom: 100px;
+    padding: 0 16px 120px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Header */
+  /* ─── Header ─── */
   .header {
     text-align: center;
-    padding: 20px 0 16px;
+    padding: 28px 0 20px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 2px;
+  }
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    border-radius: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+  .header-logo svg {
+    width: 26px;
+    height: 26px;
+    color: #fff;
   }
   .header h1 {
     font-size: 20px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
   }
   .header p {
     font-size: 12px;
-    color: var(--text2);
+    color: var(--text-secondary);
     margin-top: 4px;
+    letter-spacing: 0.3px;
   }
 
-  /* Upload Zone */
+  /* ─── Upload Zone ─── */
   .upload-zone {
-    border: 2px dashed #333;
-    border-radius: var(--radius);
-    padding: 40px 20px;
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 36px 20px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
-    background: var(--card);
-    margin-top: 16px;
+    transition: var(--transition);
+    background: var(--surface);
+    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .upload-zone:active::before {
+    opacity: 1;
   }
   .upload-zone:active {
     border-color: var(--accent);
-    background: rgba(0, 212, 255, 0.05);
     transform: scale(0.98);
   }
   .upload-zone.has-file {
     border-color: var(--success);
-    background: rgba(46, 213, 115, 0.08);
+    border-style: solid;
+    background: var(--surface);
   }
-  .upload-icon {
-    font-size: 48px;
-    margin-bottom: 8px;
-    display: block;
+  .upload-zone.has-file::before {
+    background: radial-gradient(circle at center, rgba(0, 206, 201, 0.08) 0%, transparent 70%);
+    opacity: 1;
+  }
+  .upload-icon-wrap {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 12px;
+    background: var(--surface2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    position: relative;
+    z-index: 1;
+  }
+  .upload-zone.has-file .upload-icon-wrap {
+    background: var(--success-bg);
+  }
+  .upload-icon-wrap svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+  .upload-zone.has-file .upload-icon-wrap svg {
+    color: var(--success);
   }
   .upload-zone h2 {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--text);
     font-weight: 600;
+    position: relative;
+    z-index: 1;
   }
   .upload-zone p {
     font-size: 12px;
-    color: var(--text2);
+    color: var(--text-muted);
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .upload-zone .change-hint {
+    font-size: 11px;
+    color: var(--accent-light);
     margin-top: 6px;
+    position: relative;
+    z-index: 1;
   }
 
-  /* File Info Card */
+  /* ─── File Info Card ─── */
   .file-info {
     display: none;
-    background: var(--card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: 14px 16px;
     margin-top: 12px;
   }
   .file-info.show { display: block; }
   .file-info-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #222;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
     font-size: 13px;
   }
   .file-info-row:last-child { border: none; }
-  .file-info-label { color: var(--text2); }
-  .file-info-value { color: var(--text); font-weight: 600; }
+  .file-info-label {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .file-info-label svg {
+    width: 15px;
+    height: 15px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .file-info-value { color: var(--text); font-weight: 600; text-align: right; word-break: break-all; }
   .file-info-value.danger { color: var(--danger); }
   .file-info-value.warn { color: var(--warn); }
   .file-info-value.success { color: var(--success); }
 
-  /* Skip Patterns (Toggleable) */
+  /* ─── Skip Patterns ─── */
   .patterns-section {
     display: none;
-    background: var(--card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 16px;
     margin-top: 12px;
@@ -126,17 +228,30 @@
   }
   .patterns-header h3 {
     font-size: 14px;
-    color: var(--accent);
+    color: var(--text);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .patterns-header h3 svg {
+    width: 16px;
+    height: 16px;
+    color: var(--accent-light);
   }
   .patterns-toggle {
-    font-size: 12px;
-    color: var(--text2);
-    background: var(--card2);
-    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--accent-light);
+    background: var(--surface2);
+    padding: 5px 12px;
     border-radius: 8px;
-    border: none;
-    color: var(--accent);
+    border: 1px solid var(--border);
     cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  .patterns-toggle:active {
+    background: var(--surface3);
   }
   .patterns-list {
     display: none;
@@ -147,19 +262,23 @@
   .patterns-list.show { display: flex; }
   .pattern-tag {
     font-size: 11px;
-    background: var(--card2);
-    color: var(--text2);
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid #333;
+    background: var(--surface2);
+    color: var(--text-muted);
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
   }
+  .pattern-tag:active { transform: scale(0.96); }
   .pattern-tag.active {
-    background: rgba(0, 212, 255, 0.15);
-    color: var(--accent);
-    border-color: var(--accent);
+    background: rgba(108, 92, 231, 0.12);
+    color: var(--accent-light);
+    border-color: rgba(108, 92, 231, 0.4);
   }
 
-  /* Stats */
+  /* ─── Stats Grid ─── */
   .stats-grid {
     display: none;
     grid-template-columns: 1fr 1fr;
@@ -168,92 +287,125 @@
   }
   .stats-grid.show { display: grid; }
   .stat-card {
-    background: var(--card);
-    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 14px;
     text-align: center;
+    transition: var(--transition);
   }
   .stat-value {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
   .stat-value.green { color: var(--success); }
   .stat-value.red { color: var(--danger); }
-  .stat-value.blue { color: var(--accent); }
+  .stat-value.blue { color: var(--accent-light); }
   .stat-value.orange { color: var(--warn); }
   .stat-label {
     font-size: 11px;
-    color: var(--text2);
+    color: var(--text-muted);
     margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
   }
 
-  /* Button */
+  /* ─── Buttons ─── */
   .btn {
     display: none;
     width: 100%;
-    padding: 16px;
+    padding: 15px;
     border: none;
     border-radius: var(--radius);
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 16px;
-    transition: all 0.2s;
+    margin-top: 14px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.2px;
   }
-  .btn.show { display: block; }
+  .btn.show { display: flex; align-items: center; justify-content: center; gap: 10px; }
   .btn:active { transform: scale(0.97); }
-  .btn-compress {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-  }
-  .btn-download {
-    background: linear-gradient(135deg, var(--success), #17c063);
-    color: #fff;
-  }
   .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+  }
+  .btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .btn-compress {
+    background: linear-gradient(135deg, var(--accent), #8b7cf7);
+    color: #fff;
+    box-shadow: 0 4px 16px var(--accent-glow);
+  }
+  .btn-compress:active {
+    box-shadow: 0 2px 8px var(--accent-glow);
+  }
+  .btn-download {
+    background: linear-gradient(135deg, #00b894, var(--success));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0, 206, 201, 0.25);
+  }
+  .btn-download:active {
+    box-shadow: 0 2px 8px rgba(0, 206, 201, 0.25);
+  }
+  .btn-download.downloading {
+    background: linear-gradient(135deg, #2d3436, #636e72);
+    box-shadow: none;
+  }
+  .btn-download.downloaded {
+    background: linear-gradient(135deg, #00b894, var(--success));
   }
 
-  /* Progress */
+  /* ─── Progress ─── */
   .progress-section {
     display: none;
-    background: var(--card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px 16px;
-    margin-top: 16px;
+    margin-top: 14px;
     text-align: center;
   }
   .progress-section.show { display: block; }
+  .progress-pct {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-light);
+    font-variant-numeric: tabular-nums;
+  }
   .progress-bar-bg {
     width: 100%;
-    height: 8px;
-    background: #222;
-    border-radius: 4px;
+    height: 6px;
+    background: var(--surface3);
+    border-radius: 3px;
     overflow: hidden;
-    margin: 12px 0;
+    margin: 14px 0 10px;
   }
   .progress-bar-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 4px;
-    transition: width 0.3s;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 3px;
+    transition: width 0.3s ease;
   }
   .progress-text {
-    font-size: 13px;
-    color: var(--text2);
-  }
-  .progress-pct {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--accent);
+    font-size: 12px;
+    color: var(--text-secondary);
   }
 
-  /* Skipped Files Log */
+  /* ─── Skipped Files Log ─── */
   .skipped-log {
     display: none;
-    background: var(--card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 16px;
     margin-top: 12px;
@@ -264,103 +416,393 @@
   .skipped-log h3 {
     font-size: 13px;
     color: var(--warn);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .skipped-log h3 svg {
+    width: 15px;
+    height: 15px;
   }
   .skipped-log .log-item {
     font-size: 11px;
-    color: var(--text2);
-    padding: 3px 0;
-    border-bottom: 1px solid #1a1a1a;
+    color: var(--text-secondary);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
     word-break: break-all;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
   }
-  .skipped-log .log-item span {
+  .skipped-log .log-item:last-child { border: none; }
+  .skipped-log .log-item .log-path {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .skipped-log .log-item .log-reason {
     color: var(--danger);
-    float: right;
+    flex-shrink: 0;
+    font-size: 10px;
   }
 
-  /* Result Card */
+  /* ─── Result Card ─── */
   .result-card {
     display: none;
-    background: linear-gradient(135deg, rgba(46, 213, 115, 0.1), rgba(0, 212, 255, 0.1));
-    border: 1px solid rgba(46, 213, 115, 0.3);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(0, 206, 201, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    margin-top: 14px;
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
   .result-card.show { display: block; }
-  .result-icon { font-size: 40px; margin-bottom: 8px; }
-  .result-title { font-size: 18px; font-weight: 700; color: var(--success); }
-  .result-detail { font-size: 13px; color: var(--text2); margin-top: 6px; }
-  .result-saved {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--warn);
-    margin-top: 8px;
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(0, 206, 201, 0.1) 0%, transparent 70%);
+    pointer-events: none;
   }
+  .result-icon-wrap {
+    width: 52px;
+    height: 52px;
+    background: var(--success-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .result-icon-wrap svg {
+    width: 26px;
+    height: 26px;
+    color: var(--success);
+  }
+  .result-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .result-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+  }
+  .result-saved {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--success);
+    margin-top: 10px;
+  }
+  .result-saved.neutral { color: var(--text-secondary); }
 
-  /* Floating tip */
-  .tip {
+  /* ─── Toast Notifications ─── */
+  .toast-container {
     position: fixed;
-    bottom: 16px;
+    top: 16px;
     left: 16px;
     right: 16px;
-    background: var(--card2);
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 12px;
-    color: var(--text2);
-    text-align: center;
-    z-index: 10;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    pointer-events: auto;
+    animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--transition);
+  }
+  .toast.removing {
+    animation: toastOut 0.3s ease forwards;
+  }
+  .toast-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .toast-icon svg {
+    width: 16px;
+    height: 16px;
+    color: #fff;
+  }
+  .toast-icon.success { background: var(--success); }
+  .toast-icon.error { background: var(--danger); }
+  .toast-icon.info { background: var(--accent); }
+  .toast-icon.warn { background: #e17055; }
+  .toast-body { flex: 1; min-width: 0; }
+  .toast-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .toast-message {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+  }
+  .toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 0 var(--radius) var(--radius);
+    animation: toastProgress 3s linear forwards;
+  }
+  .toast-progress.success { background: var(--success); }
+  .toast-progress.error { background: var(--danger); }
+  .toast-progress.info { background: var(--accent); }
+  .toast-progress.warn { background: #e17055; }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  }
+  @keyframes toastProgress {
+    from { width: 100%; }
+    to { width: 0%; }
   }
 
-  /* Hidden file input */
+  /* ─── Download Overlay ─── */
+  .download-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 18, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+  .download-overlay.show { display: flex; }
+  .download-overlay-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 28px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+    animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dl-spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .dl-spinner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3px solid var(--surface3);
+    border-radius: 50%;
+  }
+  .dl-spinner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3px solid transparent;
+    border-top-color: var(--accent-light);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .dl-check {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    background: var(--success-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dl-check svg { width: 24px; height: 24px; color: var(--success); }
+  .dl-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .dl-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+  .dl-size {
+    font-size: 14px;
+    color: var(--accent-light);
+    font-weight: 600;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: rgba(108, 92, 231, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .dl-close-btn {
+    margin-top: 20px;
+    padding: 10px 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .dl-close-btn:active {
+    background: var(--surface3);
+    transform: scale(0.97);
+  }
+
+  /* ─── Bottom Tip ─── */
+  .tip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+  }
+  .tip-icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(108, 92, 231, 0.12);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tip-icon svg {
+    width: 14px;
+    height: 14px;
+    color: var(--accent-light);
+  }
+  .tip-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ─── Hidden ─── */
   #fileInput { display: none; }
 
-  /* Scrollbar */
+  /* ─── Scrollbar ─── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 </style>
 </head>
 <body>
 
 <input type="file" id="fileInput" accept=".zip">
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Download Overlay -->
+<div class="download-overlay" id="downloadOverlay">
+  <div class="download-overlay-card" id="dlCard">
+    <div id="dlContent"></div>
+  </div>
+</div>
+
 <!-- Header -->
 <div class="header">
-  <h1>🧹 ZIP Compressor</h1>
-  <p>Flutter Build Bot — Compress & Clean ZIP</p>
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="12" y2="12"/>
+      <line x1="15" y1="15" x2="12" y2="12"/>
+    </svg>
+  </div>
+  <h1>ZIP Compressor</h1>
+  <p>Flutter Build Bot &mdash; Compress &amp; Clean</p>
 </div>
 
 <!-- Upload Zone -->
 <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-  <span class="upload-icon">📦</span>
-  <h2 id="uploadTitle">Tap to upload ZIP</h2>
-  <p id="uploadSubtitle">Project Flutter yang ingin di-compress</p>
+  <div class="upload-icon-wrap" id="uploadIconWrap">
+    <svg id="uploadIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+  </div>
+  <h2 id="uploadTitle">Tap to Upload ZIP</h2>
+  <p id="uploadSubtitle">Pilih project Flutter yang ingin di-compress</p>
+  <p class="change-hint" id="changeHint" style="display:none">Tap untuk ganti file</p>
 </div>
 
 <!-- File Info -->
 <div class="file-info" id="fileInfo">
   <div class="file-info-row">
-    <span class="file-info-label">File</span>
-    <span class="file-info-value" id="infoName">—</span>
+    <span class="file-info-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      File
+    </span>
+    <span class="file-info-value" id="infoName">&mdash;</span>
   </div>
   <div class="file-info-row">
-    <span class="file-info-label">Original Size</span>
-    <span class="file-info-value" id="infoSize">—</span>
+    <span class="file-info-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Original Size
+    </span>
+    <span class="file-info-value" id="infoSize">&mdash;</span>
   </div>
   <div class="file-info-row">
-    <span class="file-info-label">Status</span>
-    <span class="file-info-value" id="infoStatus">—</span>
+    <span class="file-info-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Status
+    </span>
+    <span class="file-info-value" id="infoStatus">&mdash;</span>
   </div>
 </div>
 
 <!-- Patterns -->
 <div class="patterns-section" id="patternsSection">
   <div class="patterns-header" onclick="togglePatterns()">
-    <h3>⚙️ Filter Settings</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Filter Settings
+    </h3>
     <button class="patterns-toggle" id="patternsToggle">Show</button>
   </div>
   <div class="patterns-list" id="patternsList"></div>
@@ -397,49 +839,59 @@
 
 <!-- Skipped Files Log -->
 <div class="skipped-log" id="skippedLog">
-  <h3>📋 File yang dihapus:</h3>
+  <h3>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Removed Files
+  </h3>
   <div id="skippedList"></div>
 </div>
 
 <!-- Result -->
 <div class="result-card" id="resultCard">
-  <div class="result-icon">✅</div>
-  <div class="result-title">Compress Berhasil!</div>
+  <div class="result-icon-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  </div>
+  <div class="result-title">Compression Complete</div>
   <div class="result-detail" id="resultDetail"></div>
   <div class="result-saved" id="resultSaved"></div>
 </div>
 
 <!-- Buttons -->
 <button class="btn btn-compress" id="btnCompress" onclick="startCompress()">
-  🧹 Compress ZIP
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+  <span>Compress ZIP</span>
 </button>
 <button class="btn btn-download" id="btnDownload" onclick="downloadZip()">
-  📥 Download Clean ZIP
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  <span id="btnDownloadText">Download Clean ZIP</span>
 </button>
 
-<!-- Tip -->
+<!-- Bottom Tip -->
 <div class="tip" id="tip">
-  💡 Upload ZIP project Flutter → Compress buang file gak penting → Download ZIP bersih → Upload ke bot
+  <div class="tip-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  </div>
+  <div class="tip-text">Upload ZIP project Flutter &rarr; Compress &amp; buang file tidak penting &rarr; Download ZIP bersih &rarr; Upload ke bot</div>
 </div>
 
 <script>
 // ── Config ──
 const SKIP_PATTERNS = [
-  { pattern: '.dart_tool/', desc: '.dart_tool/ (Dart cache)', active: true },
-  { pattern: '.gradle/', desc: '.gradle/ (Gradle cache)', active: true },
-  { pattern: '.idea/', desc: '.idea/ (IDE config)', active: true },
-  { pattern: 'build/', desc: 'build/ (Build output)', active: true },
-  { pattern: '.git/', desc: '.git/ (Git data)', active: true },
+  { pattern: '.dart_tool/', desc: '.dart_tool/', active: true },
+  { pattern: '.gradle/', desc: '.gradle/', active: true },
+  { pattern: '.idea/', desc: '.idea/', active: true },
+  { pattern: 'build/', desc: 'build/', active: true },
+  { pattern: '.git/', desc: '.git/', active: true },
   { pattern: 'node_modules/', desc: 'node_modules/', active: true },
-  { pattern: '.DS_Store', desc: '.DS_Store (macOS)', active: true },
-  { pattern: 'ios/Pods/', desc: 'ios/Pods/ (iOS deps)', active: true },
-  { pattern: 'windows/flutter/generated_plugins/', desc: 'Generated plugins', active: true },
-  { pattern: 'linux/flutter/generated_plugins/', desc: 'Generated plugins', active: true },
+  { pattern: '.DS_Store', desc: '.DS_Store', active: true },
+  { pattern: 'ios/Pods/', desc: 'ios/Pods/', active: true },
+  { pattern: 'windows/flutter/generated_plugins/', desc: 'win/plugins/', active: true },
+  { pattern: 'linux/flutter/generated_plugins/', desc: 'linux/plugins/', active: true },
   { pattern: '.metadata', desc: '.metadata', active: true },
 ];
 
 const SKIP_EXTENSIONS = ['.iml', '.class'];
-const MAX_PER_FILE = 50 * 1024 * 1024; // 50MB per file
+const MAX_PER_FILE = 50 * 1024 * 1024;
 
 let originalZip = null;
 let originalSize = 0;
@@ -448,15 +900,45 @@ let compressedSize = 0;
 let compressedFileName = '';
 let analysisResult = null;
 
+// ── Toast System ──
+function showToast(type, title, message, duration) {
+  duration = duration || 3000;
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.position = 'relative';
+
+  const iconSvg = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+  };
+
+  toast.innerHTML = '<div class="toast-icon ' + type + '">' + iconSvg[type] + '</div>' +
+    '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+    '<div class="toast-message">' + message + '</div></div>' +
+    '<div class="toast-progress ' + type + '" style="animation-duration: ' + (duration / 1000) + 's"></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() {
+    toast.classList.add('removing');
+    setTimeout(function() {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, duration);
+}
+
 // ── Init Patterns UI ──
 function initPatterns() {
   const list = document.getElementById('patternsList');
-  SKIP_PATTERNS.forEach((p, i) => {
+  SKIP_PATTERNS.forEach(function(p, i) {
     const tag = document.createElement('div');
     tag.className = 'pattern-tag' + (p.active ? ' active' : '');
     tag.textContent = p.desc;
     tag.dataset.index = i;
-    tag.onclick = (e) => {
+    tag.onclick = function(e) {
       e.stopPropagation();
       SKIP_PATTERNS[i].active = !SKIP_PATTERNS[i].active;
       tag.classList.toggle('active');
@@ -474,11 +956,11 @@ function togglePatterns() {
 }
 
 // ── File Upload ──
-document.getElementById('fileInput').addEventListener('change', async (e) => {
+document.getElementById('fileInput').addEventListener('change', async function(e) {
   const file = e.target.files[0];
   if (!file) return;
   if (!file.name.endsWith('.zip')) {
-    alert('File harus berformat .zip!');
+    showToast('error', 'Invalid File', 'Hanya file .zip yang diperbolehkan');
     return;
   }
 
@@ -486,6 +968,11 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
   zone.classList.add('has-file');
   document.getElementById('uploadTitle').textContent = file.name;
   document.getElementById('uploadSubtitle').textContent = formatSize(file.size);
+  document.getElementById('changeHint').style.display = 'block';
+
+  // Replace upload icon with checkmark
+  document.getElementById('uploadIcon').outerHTML =
+    '<svg id="uploadIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
 
   // Show file info
   document.getElementById('fileInfo').classList.add('show');
@@ -502,9 +989,11 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
   try {
     originalZip = await JSZip.loadAsync(file);
     await analyzeZip();
+    showToast('success', 'File Loaded', file.name + ' berhasil dibaca');
   } catch (err) {
     document.getElementById('infoStatus').textContent = 'Error: ' + err.message;
     document.getElementById('infoStatus').className = 'file-info-value danger';
+    showToast('error', 'Read Error', err.message);
     console.error(err);
   }
 });
@@ -512,34 +1001,35 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
 // ── Analyze ──
 async function analyzeZip() {
   const entries = [];
-  originalZip.forEach((path, entry) => {
-    if (!entry.dir) entries.push({ path, entry });
+  originalZip.forEach(function(path, entry) {
+    if (!entry.dir) entries.push({ path: path, entry: entry });
   });
 
   let kept = 0, skipped = 0;
   const skippedFiles = [];
 
-  for (const { path, entry } of entries) {
-    if (shouldSkip(path)) {
+  for (let i = 0; i < entries.length; i++) {
+    const item = entries[i];
+    if (shouldSkip(item.path)) {
       skipped++;
-      skippedFiles.push({ path, reason: getSkipReason(path) });
+      skippedFiles.push({ path: item.path, reason: getSkipReason(item.path) });
     } else {
       kept++;
     }
   }
 
-  analysisResult = { kept, skipped, skippedFiles, total: entries.length };
+  analysisResult = { kept: kept, skipped: skipped, skippedFiles: skippedFiles, total: entries.length };
 
   // Update UI
   const statusEl = document.getElementById('infoStatus');
   if (originalSize > 20 * 1024 * 1024) {
-    statusEl.textContent = '⚠️ Perlu di-compress (>20MB)';
+    statusEl.textContent = 'Perlu di-compress (>20MB)';
     statusEl.className = 'file-info-value danger';
   } else if (originalSize > 15 * 1024 * 1024) {
     statusEl.textContent = 'Dianjurkan compress (>15MB)';
     statusEl.className = 'file-info-value warn';
   } else {
-    statusEl.textContent = '✅ Ukuran OK';
+    statusEl.textContent = 'Ukuran OK';
     statusEl.className = 'file-info-value success';
   }
 
@@ -556,16 +1046,18 @@ async function analyzeZip() {
     logEl.classList.add('show');
     const listEl = document.getElementById('skippedList');
     listEl.innerHTML = '';
-    skippedFiles.slice(0, 50).forEach(f => {
+    const showFiles = skippedFiles.slice(0, 50);
+    for (let i = 0; i < showFiles.length; i++) {
+      const f = showFiles[i];
       const item = document.createElement('div');
       item.className = 'log-item';
-      item.innerHTML = `${f.path} <span>${f.reason}</span>`;
+      item.innerHTML = '<span class="log-path">' + f.path + '</span><span class="log-reason">' + f.reason + '</span>';
       listEl.appendChild(item);
-    });
+    }
     if (skippedFiles.length > 50) {
       const more = document.createElement('div');
       more.className = 'log-item';
-      more.textContent = `...dan ${skippedFiles.length - 50} file lainnya`;
+      more.innerHTML = '<span class="log-path">...dan ' + (skippedFiles.length - 50) + ' file lainnya</span>';
       listEl.appendChild(more);
     }
   }
@@ -574,44 +1066,42 @@ async function analyzeZip() {
   if (skipped > 0) {
     document.getElementById('btnCompress').classList.add('show');
   } else {
-    document.getElementById('infoStatus').textContent = '✅ Sudah bersih, tidak perlu compress';
+    document.getElementById('infoStatus').textContent = 'Sudah bersih, tidak perlu compress';
     document.getElementById('infoStatus').className = 'file-info-value success';
   }
 }
 
 // ── Should Skip ──
 function shouldSkip(filePath) {
-  for (const p of SKIP_PATTERNS) {
+  for (let i = 0; i < SKIP_PATTERNS.length; i++) {
+    const p = SKIP_PATTERNS[i];
     if (!p.active) continue;
     const pat = p.pattern;
     if (pat.endsWith('/')) {
-      if (filePath.startsWith(pat) || filePath.split('/').includes(pat.slice(0, -1))) return true;
+      if (filePath.startsWith(pat) || filePath.split('/').indexOf(pat.slice(0, -1)) !== -1) return true;
     } else {
-      if (filePath === pat || filePath.split('/').includes(pat)) return true;
+      if (filePath === pat || filePath.split('/').indexOf(pat) !== -1) return true;
     }
   }
-  // Skip specific extensions
   const ext = filePath.substring(filePath.lastIndexOf('.'));
-  if (SKIP_EXTENSIONS.includes(ext)) return true;
-  // Skip lock files (except pubspec.lock)
+  if (SKIP_EXTENSIONS.indexOf(ext) !== -1) return true;
   if (ext === '.lock' && !filePath.endsWith('pubspec.lock')) return true;
-  // Skip files > 50MB
-  // (We'll check this during compression)
   return false;
 }
 
 function getSkipReason(path) {
-  for (const p of SKIP_PATTERNS) {
+  for (let i = 0; i < SKIP_PATTERNS.length; i++) {
+    const p = SKIP_PATTERNS[i];
     if (!p.active) continue;
     const pat = p.pattern;
     if (pat.endsWith('/')) {
-      if (path.startsWith(pat) || path.split('/').includes(pat.slice(0, -1))) return p.desc;
+      if (path.startsWith(pat) || path.split('/').indexOf(pat.slice(0, -1)) !== -1) return p.desc;
     } else {
-      if (path === pat || path.split('/').includes(pat)) return p.desc;
+      if (path === pat || path.split('/').indexOf(pat) !== -1) return p.desc;
     }
   }
   const ext = path.substring(path.lastIndexOf('.'));
-  if (SKIP_EXTENSIONS.includes(ext)) return 'Extension ' + ext;
+  if (SKIP_EXTENSIONS.indexOf(ext) !== -1) return 'Ext ' + ext;
   if (ext === '.lock' && !path.endsWith('pubspec.lock')) return 'Lock file';
   return 'Unknown';
 }
@@ -622,49 +1112,49 @@ async function startCompress() {
 
   const btn = document.getElementById('btnCompress');
   btn.disabled = true;
-  btn.textContent = '⏳ Compressing...';
+  btn.querySelector('span').textContent = 'Compressing...';
 
   const prog = document.getElementById('progressSection');
   prog.classList.add('show');
 
+  showToast('info', 'Compressing', 'Memproses file, mohon tunggu...', 4000);
+
   try {
     const newZip = new JSZip();
     const entries = [];
-    originalZip.forEach((path, entry) => {
-      if (!entry.dir) entries.push({ path, entry });
+    originalZip.forEach(function(path, entry) {
+      if (!entry.dir) entries.push({ path: path, entry: entry });
     });
 
     let processed = 0;
     const total = entries.length;
     let kept = 0, skipped = 0;
 
-    for (const { path, entry } of entries) {
+    for (let i = 0; i < entries.length; i++) {
+      const item = entries[i];
       const pct = Math.round((processed / total) * 100);
-      updateProgress(pct, `Processing: ${path.split('/').pop()} (${processed + 1}/${total})`);
+      updateProgress(pct, 'Processing: ' + item.path.split('/').pop() + ' (' + (processed + 1) + '/' + total + ')');
 
-      if (shouldSkip(path)) {
+      if (shouldSkip(item.path)) {
         skipped++;
         processed++;
         continue;
       }
 
-      // Get file data
-      const data = await entry.async('arraybuffer');
+      const data = await item.entry.async('arraybuffer');
 
-      // Skip files > 50MB
       if (data.byteLength > MAX_PER_FILE) {
         skipped++;
         processed++;
         continue;
       }
 
-      newZip.file(path, data);
+      newZip.file(item.path, data);
       kept++;
       processed++;
 
-      // Small delay to allow UI update
       if (processed % 10 === 0) {
-        await new Promise(r => setTimeout(r, 0));
+        await new Promise(function(r) { setTimeout(r, 0); });
       }
     }
 
@@ -674,7 +1164,7 @@ async function startCompress() {
       type: 'blob',
       compression: 'DEFLATE',
       compressionOptions: { level: 6 },
-    }, (metadata) => {
+    }, function(metadata) {
       const pct = 90 + Math.round(metadata.percent / 10);
       updateProgress(pct, 'Compressing data...');
     });
@@ -693,39 +1183,136 @@ async function startCompress() {
     const savedPct = Math.round((saved / originalSize) * 100);
     document.getElementById('resultCard').classList.add('show');
     document.getElementById('resultDetail').textContent =
-      `${kept} files kept, ${skipped} files removed`;
-    document.getElementById('resultSaved').textContent =
-      saved > 0 ? `Hemat ${formatSize(saved)} (${savedPct}%)` : 'Tidak ada penghematan';
+      kept + ' files kept, ' + skipped + ' files removed';
+    const savedEl = document.getElementById('resultSaved');
+    if (saved > 0) {
+      savedEl.textContent = 'Hemat ' + formatSize(saved) + ' (' + savedPct + '%)';
+      savedEl.className = 'result-saved';
+    } else {
+      savedEl.textContent = 'Tidak ada penghematan';
+      savedEl.className = 'result-saved neutral';
+    }
 
     // Show download button
     const dlBtn = document.getElementById('btnDownload');
     dlBtn.classList.add('show');
-    dlBtn.textContent = `📥 Download (${formatSize(compressedSize)})`;
+    document.getElementById('btnDownloadText').textContent = 'Download (' + formatSize(compressedSize) + ')';
 
     // Hide compress button
     btn.classList.remove('show');
     btn.disabled = false;
-    btn.textContent = '🧹 Compress ZIP';
+    btn.querySelector('span').textContent = 'Compress ZIP';
+
+    showToast('success', 'Compress Berhasil', 'File berhasil di-compress! Tap Download untuk menyimpan.');
 
   } catch (err) {
     console.error(err);
     updateProgress(0, 'Error: ' + err.message);
     btn.disabled = false;
-    btn.textContent = '🧹 Compress ZIP';
+    btn.querySelector('span').textContent = 'Compress ZIP';
+    showToast('error', 'Compression Failed', err.message, 5000);
   }
 }
 
-// ── Download ──
-function downloadZip() {
-  if (!compressedBlob) return;
-  const url = URL.createObjectURL(compressedBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = compressedFileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+// ── Download with Full Feedback ──
+async function downloadZip() {
+  if (!compressedBlob) {
+    showToast('error', 'Error', 'Tidak ada file yang siap di-download');
+    return;
+  }
+
+  const btn = document.getElementById('btnDownload');
+  const overlay = document.getElementById('downloadOverlay');
+  const dlContent = document.getElementById('dlContent');
+
+  // Disable button, show downloading state
+  btn.classList.add('downloading');
+  btn.disabled = true;
+  document.getElementById('btnDownloadText').textContent = 'Preparing Download...';
+
+  // Show overlay with spinner
+  overlay.classList.add('show');
+  dlContent.innerHTML =
+    '<div class="dl-spinner"></div>' +
+    '<div class="dl-title">Preparing Download</div>' +
+    '<div class="dl-subtitle">Membuat file untuk di-download...</div>';
+
+  // Small delay to let UI render
+  await new Promise(function(r) { setTimeout(r, 600); });
+
+  try {
+    // Method 1: Try opening in new window (works better in some WebViews)
+    const url = URL.createObjectURL(compressedBlob);
+
+    // Try using the Telegram WebApp API if available
+    let downloadSuccess = false;
+
+    if (window.Telegram && window.Telegram.WebApp) {
+      try {
+        // In Telegram Mini App, try openLink which can handle downloads
+        window.Telegram.WebApp.openLink(url);
+        downloadSuccess = true;
+      } catch(e) {
+        // Fallback below
+      }
+    }
+
+    if (!downloadSuccess) {
+      // Standard blob download approach
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = compressedFileName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+
+      // Wait a moment before cleanup
+      await new Promise(function(r) { setTimeout(r, 1500); });
+      document.body.removeChild(a);
+    }
+
+    // Keep URL alive a bit longer
+    setTimeout(function() {
+      URL.revokeObjectURL(url);
+    }, 30000);
+
+    // Show success in overlay
+    dlContent.innerHTML =
+      '<div class="dl-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+      '<div class="dl-title">Download Started</div>' +
+      '<div class="dl-subtitle">File sedang di-download ke perangkat kamu.<br>Cek notifikasi download atau folder Downloads.</div>' +
+      '<div class="dl-size">' + compressedFileName + ' &mdash; ' + formatSize(compressedSize) + '</div>' +
+      '<button class="dl-close-btn" onclick="closeDownloadOverlay()">Tutup</button>';
+
+    // Update button
+    btn.classList.remove('downloading');
+    btn.classList.add('downloaded');
+    document.getElementById('btnDownloadText').textContent = 'Downloaded';
+
+    showToast('success', 'Download Started', 'Cek folder Downloads di perangkat kamu', 4000);
+
+  } catch (err) {
+    // Show error in overlay
+    dlContent.innerHTML =
+      '<div class="dl-check" style="background: var(--danger-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>' +
+      '<div class="dl-title">Download Gagal</div>' +
+      '<div class="dl-subtitle">' + err.message + '<br><br>Coba tap tombol download sekali lagi.</div>' +
+      '<button class="dl-close-btn" onclick="closeDownloadOverlay()">Tutup</button>';
+
+    btn.classList.remove('downloading');
+    btn.disabled = false;
+    document.getElementById('btnDownloadText').textContent = 'Download (' + formatSize(compressedSize) + ')';
+
+    showToast('error', 'Download Failed', err.message);
+  }
+}
+
+function closeDownloadOverlay() {
+  document.getElementById('downloadOverlay').classList.remove('show');
+  const btn = document.getElementById('btnDownload');
+  btn.classList.remove('downloaded');
+  btn.disabled = false;
+  document.getElementById('btnDownloadText').textContent = 'Download Lagi (' + formatSize(compressedSize) + ')';
 }
 
 // ── Helpers ──

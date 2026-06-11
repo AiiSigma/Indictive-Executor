@@ -383,7 +383,14 @@ var tgApp=isTelegram?window.Telegram.WebApp:null;
 if(tgApp){try{tgApp.ready()}catch(e){}}
 
 /* ═══ COMPRESS API (Server-side Storage) ═══ */
-var API_BASE=window.location.origin;
+/* 
+  ⚙️ KONFIGURASI:
+  - Kalau HTML di-host di server yang sama dengan API → kosongkan (otomatis pakai origin)
+  - Kalau HTML di GitHub Pages → isi URL server API kamu
+  Contoh: var COMPRESS_SERVER_URL = 'https://your-server.com';
+*/
+var COMPRESS_SERVER_URL = ''; // <-- isi URL server API kamu di sini kalau host di GitHub Pages
+var API_BASE = COMPRESS_SERVER_URL || window.location.origin;
 
 function apiSaveRecord(record,zipBlob){
   return new Promise(function(resolve,reject){

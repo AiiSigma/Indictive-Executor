@@ -2,764 +2,963 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>ZIP Compress — Flutter Build Bot</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ZIP Compressor · Flutter Build Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ───────────── RESET ───────────── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#080c10;--bg2:#0d1117;--card:#111820;--card2:#161d27;
-  --border:#1e2a38;--border2:#2a3a4e;
-  --accent:#0ff0b3;--accent2:#06c98e;
-  --accent-dim:rgba(15,240,179,0.08);--accent-mid:rgba(15,240,179,0.15);
-  --accent-glow:rgba(15,240,179,0.3);
-  --danger:#ff4f6d;--danger-dim:rgba(255,79,109,0.1);
-  --warn:#ffb347;--warn-dim:rgba(255,179,71,0.1);
-  --info:#5eaeff;--info-dim:rgba(94,174,255,0.1);
-  --tg:#29a9eb;--tg-dim:rgba(41,169,235,0.1);
-  --text:#e8edf3;--text2:#8899aa;--text3:#4a5e72;
-  --r:16px;--r2:12px;--r3:8px;
-  --font:'Space Grotesk',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
+  --bg:#060609;
+  --l1:#0b0b12;
+  --l2:#10101a;
+  --l3:#161622;
+  --l4:#1c1c2e;
+  --bdr:rgba(255,255,255,.07);
+  --bdr2:rgba(255,255,255,.12);
+  --red:#e8184a;
+  --red-d:#b5103a;
+  --red-l:#ff3d65;
+  --red-g:rgba(232,24,74,.3);
+  --cyan:#00c8f0;
+  --green:#00e676;
+  --amber:#ffb300;
+  --err:#ff3d3d;
+  --tx:#e2e2ee;
+  --tx2:#5a5a8a;
+  --tx3:#2e2e50;
+  --fmono:'Share Tech Mono',monospace;
+  --forb:'Orbitron',sans-serif;
+  --rad:14px;
+  --rad-s:8px;
+  --rad-xs:5px;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(15,240,179,0.04) 0%,transparent 70%),radial-gradient(ellipse 500px 500px at 80% 80%,rgba(6,201,142,0.03) 0%,transparent 70%);pointer-events:none;z-index:0}
+html{height:100%;background:var(--bg)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);color:var(--tx);
+  min-height:100vh;overflow-x:hidden;
+}
 
-/* ═══ LOGIN ═══ */
-.login-overlay{position:fixed;inset:0;z-index:900;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity 0.4s,visibility 0.4s}
-.login-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.login-card{width:100%;max-width:340px;text-align:center;animation:loginIn 0.5s cubic-bezier(0.16,1,0.3,1)}
-@keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.login-logo{width:64px;height:64px;margin:0 auto 20px;border-radius:18px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px var(--accent-glow);position:relative}
-.login-logo svg{width:28px;height:28px;color:#080c10}
-.login-logo::after{content:'';position:absolute;inset:-6px;border-radius:22px;background:linear-gradient(135deg,var(--accent2),var(--accent));opacity:0.15;animation:logoPulse 2.5s ease-in-out infinite}
-@keyframes logoPulse{0%,100%{transform:scale(1);opacity:0.15}50%{transform:scale(1.08);opacity:0.08}}
-.login-h{font-size:22px;font-weight:700;margin-bottom:4px}
-.login-sub{font-size:12px;color:var(--text2);margin-bottom:24px;line-height:1.6}
-.login-field{position:relative;margin-bottom:14px}
-.login-input{width:100%;padding:14px 16px 14px 44px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:var(--mono);font-size:14px;outline:none;transition:border-color 0.2s}
-.login-input:focus{border-color:var(--accent2)}
-.login-input::placeholder{color:var(--text3);font-family:var(--font)}
-.login-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text3)}
-.login-hint{font-size:10px;color:var(--text3);text-align:left;margin-bottom:20px;padding:0 4px;line-height:1.5}
-.login-btn{width:100%;padding:15px;border:none;border-radius:var(--r2);background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
-.login-btn:active{transform:scale(0.98)}
-.login-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-.login-tg-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;margin-bottom:16px;background:var(--tg-dim);border:1px solid rgba(41,169,235,0.2);font-size:11px;color:var(--tg);font-weight:500}
-.login-tg-badge svg{width:14px;height:14px}
+/* ───────────── AMBIENT BG ───────────── */
+.ambient{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -10%,rgba(232,24,74,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 30% at 100% 80%,rgba(0,200,240,.04) 0%,transparent 60%);
+}
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:36px 36px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+}
 
-/* ═══ MAIN ═══ */
-.wrap{position:relative;z-index:1;padding:0 16px 140px;max-width:460px;margin:0 auto}
-.navbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;border-bottom:1px solid var(--border)}
-.navbar-left{display:flex;align-items:center;gap:10px}
-.navbar-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--accent-glow)}
-.navbar-logo svg{width:17px;height:17px;color:#080c10}
-.navbar-brand{font-size:14px;font-weight:700;letter-spacing:-0.3px}
-.navbar-brand-sub{font-size:9px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase}
-.navbar-right{display:flex;align-items:center;gap:8px}
-.navbar-user{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 5px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:11px;font-weight:600;font-family:var(--mono);color:var(--text2)}
-.navbar-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent-mid);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--font)}
-.navbar-icon-btn{width:34px;height:34px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
-.navbar-icon-btn:active{transform:scale(0.95);background:var(--card2)}
-.navbar-icon-btn svg{width:16px;height:16px;color:var(--text2)}
+/* all content above bg layers */
+.page{position:relative;z-index:1}
 
-.upload-area{margin-top:20px;position:relative;border:1.5px dashed var(--border2);border-radius:var(--r);padding:40px 20px;text-align:center;cursor:pointer;background:var(--card);transition:all 0.3s ease}
-.upload-area:active{transform:scale(0.985);border-color:var(--accent2)}
-.upload-area.has-file{border-style:solid;border-color:var(--accent2)}
-.upload-glow{position:absolute;inset:-1px;border-radius:var(--r);background:radial-gradient(circle at 50% 50%,var(--accent-dim) 0%,transparent 70%);opacity:0;transition:opacity 0.4s;pointer-events:none}
-.upload-area.has-file .upload-glow{opacity:1}
-.upload-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;transition:all 0.3s;position:relative;z-index:1}
-.upload-icon svg{width:22px;height:22px;color:var(--text3);transition:all 0.3s}
-.upload-area.has-file .upload-icon{background:var(--accent-dim)}
-.upload-area.has-file .upload-icon svg{color:var(--accent)}
-.upload-title{font-size:15px;font-weight:600;position:relative;z-index:1}
-.upload-desc{font-size:12px;color:var(--text3);margin-top:4px;position:relative;z-index:1}
-.upload-change{font-size:11px;color:var(--accent);margin-top:8px;display:none;position:relative;z-index:1}
-.upload-area.has-file .upload-change{display:block}
+/* ───────────── TOPBAR ───────────── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--bdr);
+  background:rgba(6,6,9,.7);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  position:sticky;top:0;z-index:50;
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 18px var(--red-g),inset 0 1px 0 rgba(255,255,255,.15);
+  flex-shrink:0;
+}
+.tb-name{font-family:var(--forb);font-size:10px;font-weight:700;letter-spacing:.8px;line-height:1.2;color:var(--tx)}
+.tb-name span{display:block;font-size:7.5px;font-weight:500;color:var(--tx2);letter-spacing:1.5px;margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:6px}
+.tb-badge{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fmono);font-size:8.5px;color:var(--tx2);letter-spacing:.8px;
+  background:var(--l2);border:1px solid var(--bdr);
+  border-radius:20px;padding:4px 10px;
+}
+.pulse-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 5px var(--green);
+  animation:pdot 2s ease-in-out infinite;
+}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
 
-.file-card{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.file-card.show{display:block}
-.file-card-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
-.file-card-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.file-card-dot.green{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
-.file-card-dot.yellow{background:var(--warn)}
-.file-card-dot.red{background:var(--danger)}
-.file-card-name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-card-size{font-family:var(--mono);font-size:11px;color:var(--text2)}
-.file-card-rows{padding:4px 16px}
-.file-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
-.file-row:last-child{border:none}
-.file-row-label{color:var(--text2);display:flex;align-items:center;gap:6px}
-.file-row-label svg{width:13px;height:13px;color:var(--text3)}
-.file-row-val{font-weight:600;font-family:var(--mono);font-size:11px}
-.file-row-val.c-accent{color:var(--accent)}.file-row-val.c-warn{color:var(--warn)}.file-row-val.c-danger{color:var(--danger)}
+/* ───────────── HERO ───────────── */
+.hero{
+  padding:28px 16px 22px;
+  border-bottom:1px solid var(--bdr);
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--fmono);font-size:8.5px;color:var(--red-l);
+  letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px;
+}
+.hero-tag::before{content:'';width:16px;height:1px;background:var(--red);border-radius:1px}
+.hero-tag::after{content:'';width:16px;height:1px;background:var(--red);border-radius:1px}
+.hero-h{
+  font-family:var(--forb);font-size:28px;font-weight:900;
+  line-height:1;letter-spacing:-1px;color:var(--tx);
+  margin-bottom:3px;
+}
+.hero-h .accent{
+  display:block;color:var(--red);
+  text-shadow:0 0 40px var(--red-g);
+  font-size:34px;
+}
+.hero-p{
+  font-family:var(--fmono);font-size:10px;color:var(--tx2);
+  line-height:1.8;margin-top:12px;letter-spacing:.2px;
+}
+.hero-pills{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;
+}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--l2);border:1px solid var(--bdr);
+  border-radius:20px;padding:5px 11px;
+  font-family:var(--fmono);font-size:8.5px;color:var(--tx2);
+  letter-spacing:.4px;
+}
+.pill svg{width:9px;height:9px;flex-shrink:0}
 
-.filter-section{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.filter-section.show{display:block}
-.filter-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer}
-.filter-head-left{display:flex;align-items:center;gap:8px}
-.filter-head-left svg{width:15px;height:15px;color:var(--accent2)}
-.filter-head-left span{font-size:13px;font-weight:600}
-.filter-toggle-btn{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;background:var(--card2);color:var(--accent);border:1px solid var(--border);cursor:pointer;font-family:var(--font)}
-.filter-body{display:none;padding:0 16px 14px;flex-wrap:wrap;gap:6px}
-.filter-body.show{display:flex}
-.filter-chip{font-size:10px;padding:5px 9px;border-radius:6px;background:var(--card2);color:var(--text3);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;user-select:none;font-family:var(--mono)}
-.filter-chip:active{transform:scale(0.95)}
-.filter-chip.on{background:var(--accent-dim);color:var(--accent);border-color:rgba(15,240,179,0.25)}
+/* ───────────── MAIN CONTENT ───────────── */
+.content{padding:0 16px 32px}
 
-.stats-row{display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
-.stats-row.show{display:grid}
-.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px 8px;text-align:center}
-.stat-num{font-size:18px;font-weight:700;font-family:var(--mono)}
-.stat-num.cn{color:var(--accent)}.stat-num.cr{color:var(--danger)}.stat-num.cb{color:var(--info)}.stat-num.co{color:var(--warn)}
-.stat-lbl{font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
+/* ───────────── UPLOAD ZONE ───────────── */
+.upload-section{padding-top:18px}
+.upload-zone{
+  border:1.5px dashed var(--tx3);
+  border-radius:var(--rad);
+  background:var(--l1);
+  cursor:pointer;
+  transition:border-color .25s,background .25s,transform .15s;
+  overflow:hidden;position:relative;
+}
+.upload-zone::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 60% at 50% 0%,rgba(232,24,74,.06),transparent 70%);
+  pointer-events:none;
+}
+.upload-zone:active{transform:scale(.985)}
+.upload-zone.drag{border-color:var(--red);border-style:solid;background:rgba(232,24,74,.04)}
+.upload-zone.done{border-color:rgba(0,230,118,.4);border-style:solid;background:rgba(0,230,118,.03)}
 
-.progress-box{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center}
-.progress-box.show{display:block}
-.progress-pct{font-size:36px;font-weight:700;color:var(--accent);font-family:var(--mono)}
-.progress-track{width:100%;height:4px;background:var(--card2);border-radius:2px;margin:16px 0 12px;overflow:hidden}
-.progress-fill{height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 0.3s ease}
-.progress-label{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.uz-inner{
+  padding:32px 20px 28px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;text-align:center;
+}
+.uz-orbit{
+  position:relative;width:76px;height:76px;flex-shrink:0;
+}
+.uz-orbit-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px dashed var(--tx3);
+  animation:orb-spin 15s linear infinite;
+}
+.uz-orbit-ring::before{
+  content:'';position:absolute;
+  top:-3px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 8px var(--red);
+}
+@keyframes orb-spin{to{transform:rotate(360deg)}}
+.upload-zone.done .uz-orbit-ring{border-color:rgba(0,230,118,.3);animation:none}
+.upload-zone.done .uz-orbit-ring::before{background:var(--green);box-shadow:0 0 8px var(--green)}
+.uz-icon{
+  position:absolute;inset:0;border-radius:50%;
+  background:var(--l3);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+}
+.upload-zone.done .uz-icon{background:rgba(0,230,118,.06);border-color:rgba(0,230,118,.25)}
+.uz-icon svg{width:26px;height:26px;transition:all .3s}
+.uz-text{}
+.uz-title{font-family:var(--forb);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.5px}
+.uz-sub{font-family:var(--fmono);font-size:10px;color:var(--tx2);margin-top:5px;letter-spacing:.2px}
 
-.skip-log{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;max-height:200px;overflow-y:auto}
-.skip-log.show{display:block}
-.skip-log-head{font-size:12px;font-weight:600;color:var(--warn);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.skip-log-head svg{width:14px;height:14px}
-.skip-item{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px}
-.skip-item:last-child{border:none}
-.skip-path{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-family:var(--mono)}
-.skip-reason{color:var(--danger);flex-shrink:0;font-family:var(--mono)}
+/* ───────────── SECTION ───────────── */
+.sec{margin-top:14px}
+.sec-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:9px;
+}
+.sec-label{
+  font-family:var(--fmono);font-size:8.5px;color:var(--tx2);
+  letter-spacing:2.5px;text-transform:uppercase;
+  display:flex;align-items:center;gap:7px;
+}
+.sec-label::before{
+  content:'';width:3px;height:11px;
+  background:var(--red);border-radius:1.5px;
+  box-shadow:0 0 7px var(--red-g);
+}
 
-.result-box{display:none;margin-top:14px;background:var(--card);border:1px solid rgba(15,240,179,0.2);border-radius:var(--r);padding:28px 20px;text-align:center;position:relative;overflow:hidden}
-.result-box.show{display:block}
-.result-box::before{content:'';position:absolute;top:-60px;right:-60px;width:160px;height:160px;background:radial-gradient(circle,rgba(15,240,179,0.06) 0%,transparent 70%);pointer-events:none}
-.result-ring{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accent-glow)}
-.result-ring svg{width:26px;height:26px;color:var(--accent)}
-.result-h{font-size:17px;font-weight:700}
-.result-p{font-size:12px;color:var(--text2);margin-top:6px}
-.result-save{font-size:22px;font-weight:700;color:var(--accent);margin-top:10px;font-family:var(--mono)}
-.result-save.muted{color:var(--text3)}
+/* ───────────── CARD ───────────── */
+.card{
+  background:var(--l1);
+  border:1px solid var(--bdr);
+  border-radius:var(--rad);
+  overflow:hidden;
+}
 
-.act-btn{display:none;width:100%;margin-top:14px;padding:16px;border:none;border-radius:var(--r2);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s ease;letter-spacing:0.2px;align-items:center;justify-content:center;gap:10px}
-.act-btn.show{display:flex}
-.act-btn:active{transform:scale(0.975)}
-.act-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-.act-btn svg{width:18px;height:18px;flex-shrink:0}
-.btn-go{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#080c10;box-shadow:0 4px 20px var(--accent-glow)}
-.btn-share{background:linear-gradient(135deg,#0a9d73,var(--accent2));color:#fff;box-shadow:0 4px 20px rgba(15,240,179,0.2)}
+/* ───────────── INFO ROWS ───────────── */
+.irow{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;gap:12px;
+  border-bottom:1px solid var(--bdr);
+}
+.irow:last-child{border:none}
+.ikey{
+  display:flex;align-items:center;gap:7px;
+  font-family:var(--fmono);font-size:8.5px;color:var(--tx2);
+  letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0;
+}
+.ikey svg{width:11px;height:11px;flex-shrink:0}
+.ival{
+  font-family:var(--fmono);font-size:11px;
+  color:var(--tx);font-weight:600;text-align:right;word-break:break-all;
+}
+.ival.r{color:var(--err)}.ival.a{color:var(--amber)}.ival.g{color:var(--green)}
 
-/* ═══ HISTORY ═══ */
-.hist-overlay{position:fixed;inset:0;z-index:800;background:rgba(8,12,16,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;justify-content:flex-end;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s}
-.hist-overlay.show{opacity:1;visibility:visible}
-.hist-panel{width:100%;max-width:380px;height:100%;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1)}
-.hist-overlay.show .hist-panel{transform:translateX(0)}
-.hist-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
-.hist-head-left{display:flex;align-items:center;gap:10px}
-.hist-head-left h2{font-size:16px;font-weight:700}
-.hist-count{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--accent-dim);color:var(--accent);font-weight:600;font-family:var(--mono)}
-.hist-close{width:32px;height:32px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.hist-close svg{width:16px;height:16px;color:var(--text2)}
-.hist-actions{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.hist-action-btn{flex:1;padding:9px;border:1px solid var(--border);border-radius:var(--r3);background:var(--card);color:var(--text2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.hist-action-btn:active{background:var(--card2)}
-.hist-action-btn.danger{border-color:rgba(255,79,109,0.2);color:var(--danger)}
-.hist-action-btn.danger:active{background:var(--danger-dim)}
-.hist-list{flex:1;overflow-y:auto;padding:12px 16px}
-.hist-empty{text-align:center;padding:40px 20px}
-.hist-empty-icon{font-size:40px;margin-bottom:12px;opacity:0.3}
-.hist-empty-text{font-size:13px;color:var(--text3);line-height:1.6}
-.hist-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:10px;transition:all 0.2s;animation:histCardIn 0.3s cubic-bezier(0.16,1,0.3,1)}
-@keyframes histCardIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.hist-card-top{display:flex;align-items:flex-start;gap:10px}
-.hist-card-icon{width:36px;height:36px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.hist-card-icon svg{width:18px;height:18px;color:var(--accent)}
-.hist-card-info{flex:1;min-width:0}
-.hist-card-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hist-card-meta{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
-.hist-card-saved{font-size:11px;color:var(--accent);font-weight:600;margin-top:4px}
-.hist-card-date{font-size:9px;color:var(--text3);margin-top:4px}
-.hist-card-btns{display:flex;gap:6px;margin-top:10px}
-.hist-card-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-family:var(--font);font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
-.hist-card-btn:active{transform:scale(0.97)}
-.hist-card-btn svg{width:13px;height:13px}
-.hist-card-btn.dl{border-color:rgba(15,240,179,0.2);color:var(--accent)}
-.hist-card-btn.del{border-color:rgba(255,79,109,0.15);color:var(--danger)}
+/* ───────────── STAT GRID ───────────── */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{
+  background:var(--l1);border:1px solid var(--bdr);
+  border-radius:var(--rad);padding:14px 12px 12px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.sc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  border-radius:0 0 2px 2px;
+}
+.sc-g::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.sc-r::before{background:linear-gradient(90deg,transparent,var(--err),transparent)}
+.sc-c::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.sc-a::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.sc-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 40% at 50% 0%,var(--gl,rgba(0,0,0,0)) 0%,transparent 70%);
+  pointer-events:none;
+}
+.sc-g .sc-glow{--gl:rgba(0,230,118,.05)}
+.sc-r .sc-glow{--gl:rgba(255,61,61,.05)}
+.sc-c .sc-glow{--gl:rgba(0,200,240,.05)}
+.sc-a .sc-glow{--gl:rgba(255,179,0,.05)}
+.sc-ico{
+  width:30px;height:30px;border-radius:9px;
+  background:var(--l3);margin:0 auto 9px;
+  display:flex;align-items:center;justify-content:center;
+}
+.sc-g .sc-ico{background:rgba(0,230,118,.08)}
+.sc-r .sc-ico{background:rgba(255,61,61,.08)}
+.sc-c .sc-ico{background:rgba(0,200,240,.08)}
+.sc-a .sc-ico{background:rgba(255,179,0,.08)}
+.sc-ico svg{width:14px;height:14px}
+.sc-val{
+  font-family:var(--forb);font-size:22px;font-weight:700;
+  line-height:1;position:relative;z-index:1;
+}
+.sc-g .sc-val{color:var(--green)}
+.sc-r .sc-val{color:var(--err)}
+.sc-c .sc-val{color:var(--cyan)}
+.sc-a .sc-val{color:var(--amber)}
+.sc-lbl{
+  font-family:var(--fmono);font-size:8px;color:var(--tx2);
+  margin-top:5px;letter-spacing:1px;text-transform:uppercase;
+}
 
-/* ═══ SAVE SHEET ═══ */
-.save-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,16,0.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:700;align-items:flex-end;justify-content:center}
-.save-overlay.show{display:flex}
-.save-sheet{background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:12px 16px 28px;width:100%;max-width:460px;animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1)}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.save-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
-.save-sheet-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
-.save-fileinfo-wrap{text-align:center;margin-bottom:16px}
-.save-fileinfo{font-family:var(--mono);font-size:11px;color:var(--accent);padding:6px 14px;background:var(--accent-dim);border-radius:6px;display:inline-block;word-break:break-all}
-.save-methods{display:flex;flex-direction:column;gap:8px}
-.save-mbtn{padding:14px 16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--card);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s;text-align:left;text-decoration:none}
-.save-mbtn:active{transform:scale(0.98);background:var(--card2)}
-.save-mbtn-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.save-mbtn-icon svg{width:20px;height:20px}
-.save-mbtn-body{flex:1;min-width:0}
-.save-mbtn-name{font-size:13px;font-weight:600;display:block}
-.save-mbtn-desc{font-size:10px;color:var(--text3);margin-top:2px;display:block;line-height:1.4}
-.save-mbtn.primary{border-color:rgba(15,240,179,0.3);background:var(--accent-dim)}
-.save-mbtn.primary .save-mbtn-icon{background:var(--accent-mid)}
-.save-mbtn.primary .save-mbtn-icon svg{color:var(--accent)}
-.save-mbtn.secondary .save-mbtn-icon{background:var(--card2)}
-.save-mbtn.secondary .save-mbtn-icon svg{color:var(--text2)}
-.save-mbtn.tg .save-mbtn-icon{background:rgba(94,174,255,0.12)}
-.save-mbtn.tg .save-mbtn-icon svg{color:var(--info)}
-.save-cancel{margin-top:12px;width:100%;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
-.save-cancel:active{background:var(--border)}
+/* ───────────── FILTER ───────────── */
+.flt-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;cursor:pointer;user-select:none;
+}
+.flt-hl{display:flex;align-items:center;gap:8px}
+.flt-hl svg{width:13px;height:13px;color:var(--cyan);flex-shrink:0}
+.flt-title{font-family:var(--forb);font-size:10px;font-weight:600;color:var(--cyan);letter-spacing:.5px}
+.flt-btn{
+  font-family:var(--fmono);font-size:8.5px;
+  color:var(--cyan);letter-spacing:1px;
+  background:rgba(0,200,240,.07);border:1px solid rgba(0,200,240,.15);
+  padding:4px 12px;border-radius:20px;cursor:pointer;
+  transition:background .15s;
+}
+.flt-btn:active{background:rgba(0,200,240,.14)}
+.flt-body{
+  display:none;padding:12px 14px 14px;
+  border-top:1px solid var(--bdr);
+}
+.flt-body.open{display:block}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--fmono);font-size:9px;color:var(--tx2);
+  background:var(--l3);border:1px solid var(--bdr);
+  padding:5px 10px;border-radius:var(--rad-xs);
+  cursor:pointer;user-select:none;transition:all .15s;letter-spacing:.3px;
+}
+.tag svg{width:8px;height:8px;flex-shrink:0;opacity:.5}
+.tag.on{
+  color:var(--red-l);background:rgba(232,24,74,.1);
+  border-color:rgba(232,24,74,.28);
+}
+.tag.on svg{opacity:.9;color:var(--red-l)}
 
-/* ═══ TOAST ═══ */
-.toast-wrap{position:fixed;top:12px;left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.toast{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;animation:tIn 0.35s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden}
-.toast.out{animation:tOut 0.3s ease forwards}
-.toast-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.toast-ic svg{width:14px;height:14px}
-.toast-ic.ok{background:var(--accent-dim)}.toast-ic.ok svg{color:var(--accent)}
-.toast-ic.err{background:var(--danger-dim)}.toast-ic.err svg{color:var(--danger)}
-.toast-ic.inf{background:var(--info-dim)}.toast-ic.inf svg{color:var(--info)}
-.toast-ic.wrn{background:var(--warn-dim)}.toast-ic.wrn svg{color:var(--warn)}
-.toast-body{flex:1;min-width:0}
-.toast-t{font-size:12px;font-weight:600}
-.toast-m{font-size:10px;color:var(--text2);margin-top:1px}
-.toast-bar{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 var(--r2) var(--r2);animation:tBar 3s linear forwards}
-.toast-bar.ok{background:var(--accent)}.toast-bar.err{background:var(--danger)}.toast-bar.inf{background:var(--info)}.toast-bar.wrn{background:var(--warn)}
-@keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes tOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-16px) scale(0.96)}}
-@keyframes tBar{from{width:100%}to{width:0%}}
+/* ───────────── PROGRESS ───────────── */
+.prog-card{background:var(--l1);border:1px solid var(--bdr);border-radius:var(--rad);padding:20px 16px}
+.prog-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.prog-pct{
+  font-family:var(--forb);font-size:38px;font-weight:900;
+  color:var(--red);text-shadow:0 0 30px var(--red-g);line-height:1;
+}
+.prog-status{
+  font-family:var(--fmono);font-size:9.5px;color:var(--tx2);
+  text-align:right;max-width:55%;word-break:break-all;line-height:1.6;
+}
+.prog-rail{width:100%;height:3px;background:var(--l3);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.prog-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--red-d),var(--red-l));
+  border-radius:2px;transition:width .35s ease;
+  box-shadow:0 0 12px var(--red-g);position:relative;
+}
+.prog-bar::after{
+  content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red-l);box-shadow:0 0 8px var(--red-l);
+  display:none;
+}
+.prog-bar.active::after{display:block}
+.prog-ticks{display:flex;gap:3px}
+.pt{flex:1;height:2px;background:var(--l3);border-radius:1px;transition:background .3s}
+.pt.lit{background:var(--red);box-shadow:0 0 4px var(--red-g)}
 
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:10}
-.bottom-icon{width:28px;height:28px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.bottom-icon svg{width:13px;height:13px;color:var(--accent2)}
-.bottom-text{font-size:10px;color:var(--text2);line-height:1.5}
-#fileInput{display:none}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+/* ───────────── LOG ───────────── */
+.log-card{
+  background:var(--l1);border:1px solid var(--bdr);
+  border-left:2px solid rgba(255,179,0,.35);
+  border-radius:var(--rad);overflow:hidden;max-height:200px;overflow-y:auto;
+}
+.log-hd{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  background:var(--l2);border-bottom:1px solid var(--bdr);
+  font-family:var(--fmono);font-size:8.5px;color:var(--amber);letter-spacing:1.5px;
+}
+.log-hd svg{width:12px;height:12px;flex-shrink:0}
+.log-hd-count{
+  margin-left:auto;background:rgba(255,179,0,.12);
+  border:1px solid rgba(255,179,0,.2);
+  color:var(--amber);border-radius:20px;
+  padding:1px 8px;font-size:8px;
+}
+.log-rows{padding:6px 14px 10px}
+.lrow{
+  display:flex;align-items:flex-start;gap:7px;
+  padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  font-family:var(--fmono);font-size:9.5px;
+}
+.lrow:last-child{border:none}
+.lrow-x{flex-shrink:0;margin-top:2px;color:var(--err);opacity:.6}
+.lrow-x svg{width:9px;height:9px}
+.lrow-path{flex:1;color:var(--tx2);word-break:break-all;line-height:1.6}
+.lrow-tag{
+  flex-shrink:0;margin-top:1px;
+  font-size:8px;color:var(--err);
+  background:rgba(255,61,61,.08);
+  border:1px solid rgba(255,61,61,.12);
+  padding:1px 6px;border-radius:3px;
+  white-space:nowrap;
+}
+
+/* ───────────── RESULT ───────────── */
+.result-card{
+  background:var(--l1);border:1px solid rgba(0,230,118,.18);
+  border-radius:var(--rad);overflow:hidden;position:relative;
+}
+.result-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--green) 40%,transparent);
+}
+.result-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(0,230,118,.04),transparent 70%);
+  pointer-events:none;
+}
+.res-body{
+  padding:20px 16px 16px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:10px;
+  border-bottom:1px solid var(--bdr);
+  position:relative;z-index:1;
+}
+.res-ring{
+  width:58px;height:58px;border-radius:50%;
+  background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.22);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(0,230,118,.08);
+}
+.res-ring svg{width:26px;height:26px;color:var(--green)}
+.res-title{font-family:var(--forb);font-size:12px;font-weight:700;color:var(--green);letter-spacing:.5px}
+.res-detail{font-family:var(--fmono);font-size:10px;color:var(--tx2);line-height:1.9}
+.res-foot{
+  padding:13px 16px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  position:relative;z-index:1;
+}
+.res-save-lbl{font-family:var(--fmono);font-size:8.5px;color:var(--tx2);letter-spacing:1.5px}
+.res-save-num{
+  font-family:var(--forb);font-size:18px;font-weight:700;
+  color:var(--amber);text-shadow:0 0 18px rgba(255,179,0,.3);
+}
+
+/* ───────────── BUTTONS — no fixed footer, no overlap ───────────── */
+.btn-area{padding-top:14px}
+.btn{
+  width:100%;padding:16px 20px;border:none;border-radius:var(--rad);
+  font-family:var(--forb);font-size:11.5px;font-weight:700;
+  letter-spacing:1.5px;cursor:pointer;transition:all .2s;
+  display:none;align-items:center;justify-content:center;gap:10px;
+  position:relative;overflow:hidden;
+}
+.btn.vis{display:flex}
+.btn:active{transform:scale(.975)}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none!important}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+.btn svg{width:15px;height:15px;flex-shrink:0;position:relative;z-index:1}
+.btn span{position:relative;z-index:1}
+
+.btn-compress{
+  background:linear-gradient(135deg,var(--red) 0%,var(--red-d) 100%);
+  color:#fff;
+  box-shadow:0 6px 28px var(--red-g),0 1px 0 rgba(255,255,255,.12) inset;
+  margin-bottom:10px;
+}
+.btn-compress:not(:disabled):hover{box-shadow:0 8px 32px rgba(232,24,74,.45),0 1px 0 rgba(255,255,255,.12) inset}
+
+.btn-dl{
+  background:var(--l2);
+  color:var(--green);
+  border:1.5px solid rgba(0,230,118,.3);
+  box-shadow:0 0 0 0 rgba(0,230,118,0);
+  margin-bottom:10px;
+}
+.btn-dl:not(:disabled):hover{
+  background:rgba(0,230,118,.05);
+  box-shadow:0 4px 20px rgba(0,230,118,.1);
+}
+
+/* ───────────── DL NOTICE ───────────── */
+.dl-notice{
+  display:none;
+  background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);
+  border-radius:var(--rad);padding:12px 14px;gap:8px;
+  flex-direction:column;margin-bottom:10px;
+}
+.dl-notice.vis{display:flex}
+.dl-nr{display:flex;align-items:center;gap:9px}
+.dl-nr svg{width:13px;height:13px;color:var(--green);flex-shrink:0}
+.dl-nr-text{font-family:var(--fmono);font-size:10px;color:var(--green)}
+.dl-hint{font-family:var(--fmono);font-size:9px;color:var(--tx2);padding-left:22px;line-height:1.7}
+
+/* ───────────── INFO STRIP ───────────── */
+.info-strip{
+  margin-top:24px;
+  border:1px solid var(--bdr);border-radius:var(--rad);
+  background:var(--l1);overflow:hidden;
+}
+.is-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-bottom:1px solid var(--bdr);
+}
+.is-row:last-child{border:none}
+.is-row svg{width:12px;height:12px;color:var(--tx2);flex-shrink:0}
+.is-text{font-family:var(--fmono);font-size:9.5px;color:var(--tx2);line-height:1.6;letter-spacing:.2px}
+
+#fi{display:none}
 </style>
 </head>
 <body>
+<div class="ambient"></div>
+<div class="grid-bg"></div>
+<input type="file" id="fi" accept=".zip">
 
-<input type="file" id="fileInput" accept=".zip">
-<div class="toast-wrap" id="toastWrap"></div>
+<div class="page">
 
-<!-- ═══ LOGIN ═══ -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="M16.5 9.4 7.55 4.24"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/><circle cx="18.5" cy="15.5" r="2.5"/><path d="M20.27 17.27 22 19"/></svg>
     </div>
-    <div class="login-h">ZIP Compress</div>
-    <div class="login-sub">Masukkan Telegram ID untuk memulai.<br>Setiap user punya riwayat compress masing-masing.</div>
-    <div id="loginTgBadge" style="display:none" class="login-tg-badge">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-      <span id="loginTgName">Terverifikasi</span>
-    </div>
-    <div class="login-field">
-      <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <input type="text" class="login-input" id="loginInput" placeholder="Contoh: 123456789" autocomplete="off">
-    </div>
-    <div class="login-hint">Masukkan ID Telegram kamu (angka). Bisa dilihat di @userinfobot atau profil Telegram.</div>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">Masuk</button>
+    <div class="tb-name">FLUTTER BUILD BOT<span>ZIP COMPRESSOR v2</span></div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-badge"><div class="pulse-dot"></div>OFFLINE</div>
   </div>
 </div>
 
-<!-- ═══ HISTORY ═══ -->
-<div class="hist-overlay" id="histOverlay" onclick="closeHistIfBg(event)">
-  <div class="hist-panel">
-    <div class="hist-head">
-      <div class="hist-head-left"><h2>Riwayat</h2><span class="hist-count" id="histCount">0</span></div>
-      <div class="hist-close" onclick="closeHist()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">UTILITY TOOL</div>
+  <div class="hero-h">
+    CLEAN<br>
+    <span class="accent">ZIP.</span>
+  </div>
+  <div class="hero-p">Buang cache, build output &amp; file sampah dari project Flutter.<br>Semua proses 100% di browser — tidak ada upload ke server.</div>
+  <div class="hero-pills">
+    <div class="pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      100% Private
     </div>
-    <div class="hist-actions">
-      <button class="hist-action-btn" onclick="refreshHist()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
-      </button>
-      <button class="hist-action-btn danger" onclick="clearAllHist()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Hapus Semua
-      </button>
+    <div class="pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Client-side
     </div>
-    <div class="hist-list" id="histList"></div>
+    <div class="pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Flutter ZIP
+    </div>
   </div>
 </div>
 
-<!-- ═══ SAVE SHEET ═══ -->
-<div class="save-overlay" id="saveOverlay"><div class="save-sheet" id="saveSheet"></div></div>
+<!-- ── CONTENT ── -->
+<div class="content">
 
-<!-- ═══ MAIN ═══ -->
-<div class="wrap">
-  <div class="navbar">
-    <div class="navbar-left">
-      <div class="navbar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      <div><div class="navbar-brand">ZIP Compress</div><div class="navbar-brand-sub">Flutter Build Bot</div></div>
-    </div>
-    <div class="navbar-right">
-      <div class="navbar-user" id="navUser"><div class="navbar-avatar" id="navAvatar">?</div><span id="navUserId">—</span></div>
-      <div class="navbar-icon-btn" onclick="openHist()" title="Riwayat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-      <div class="navbar-icon-btn" onclick="doLogout()" title="Keluar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
-    </div>
-  </div>
-
-  <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-    <div class="upload-glow"></div>
-    <div class="upload-icon"><svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-    <div class="upload-title" id="uploadTitle">Tap to Upload ZIP</div>
-    <div class="upload-desc" id="uploadDesc">Pilih project Flutter untuk di-compress</div>
-    <div class="upload-change" id="uploadChange">Tap untuk ganti file</div>
-  </div>
-
-  <div class="file-card" id="fileCard">
-    <div class="file-card-header"><div class="file-card-dot" id="statusDot"></div><div class="file-card-name" id="cardName">—</div><div class="file-card-size" id="cardSize">—</div></div>
-    <div class="file-card-rows">
-      <div class="file-row"><span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Original</span><span class="file-row-val" id="rowOriginal">—</span></div>
-      <div class="file-row"><span class="file-row-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Status</span><span class="file-row-val" id="rowStatus">—</span></div>
+<!-- Upload -->
+<div class="upload-section">
+  <div class="upload-zone" id="uzone" onclick="document.getElementById('fi').click()">
+    <div class="uz-inner">
+      <div class="uz-orbit">
+        <div class="uz-orbit-ring"></div>
+        <div class="uz-icon" id="uzIcon">
+          <svg id="uzSvg" viewBox="0 0 24 24" fill="none" stroke="#2e2e50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+      </div>
+      <div class="uz-text">
+        <div class="uz-title" id="uzTitle">PILIH FILE ZIP</div>
+        <div class="uz-sub" id="uzSub">Project Flutter · Maks 200 MB</div>
+      </div>
     </div>
   </div>
-
-  <div class="filter-section" id="filterSection">
-    <div class="filter-head" onclick="toggleFilter()"><div class="filter-head-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Filter Settings</span></div><button class="filter-toggle-btn" id="filterToggle">Show</button></div>
-    <div class="filter-body" id="filterBody"></div>
-  </div>
-
-  <div class="stats-row" id="statsRow">
-    <div class="stat-box"><div class="stat-num cn" id="sKept">0</div><div class="stat-lbl">Kept</div></div>
-    <div class="stat-box"><div class="stat-num cr" id="sSkipped">0</div><div class="stat-lbl">Removed</div></div>
-    <div class="stat-box"><div class="stat-num cb" id="sOriginal">0</div><div class="stat-lbl">Original</div></div>
-    <div class="stat-box"><div class="stat-num co" id="sCompressed">0</div><div class="stat-lbl">Result</div></div>
-  </div>
-
-  <div class="progress-box" id="progressBox">
-    <div class="progress-pct" id="progPct">0%</div>
-    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
-    <div class="progress-label" id="progLabel">Menganalisis...</div>
-  </div>
-
-  <div class="skip-log" id="skipLog">
-    <div class="skip-log-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Removed Files</div>
-    <div id="skipList"></div>
-  </div>
-
-  <div class="result-box" id="resultBox">
-    <div class="result-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-    <div class="result-h">Compression Complete</div>
-    <div class="result-p" id="resultP"></div>
-    <div class="result-save" id="resultSave"></div>
-  </div>
-
-  <button class="act-btn btn-go" id="btnGo" onclick="startCompress()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Compress ZIP</span></button>
-  <button class="act-btn btn-share" id="btnShare" onclick="openSaveSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="btnShareText">Save File</span></button>
 </div>
 
-<div class="bottom-bar">
-  <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-  <div class="bottom-text">Login &rarr; Upload ZIP &rarr; Compress &rarr; Simpan ke riwayat</div>
+<!-- File Info -->
+<div class="sec" id="secInfo" style="display:none">
+  <div class="sec-hd"><div class="sec-label">File Info</div></div>
+  <div class="card">
+    <div class="irow">
+      <div class="ikey">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        Filename
+      </div>
+      <div class="ival" id="vName">—</div>
+    </div>
+    <div class="irow">
+      <div class="ikey">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Original Size
+      </div>
+      <div class="ival" id="vSize">—</div>
+    </div>
+    <div class="irow">
+      <div class="ikey">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Status
+      </div>
+      <div class="ival" id="vStatus">Menganalisis...</div>
+    </div>
+  </div>
 </div>
+
+<!-- Stats -->
+<div class="sec" id="secStats" style="display:none">
+  <div class="sec-hd"><div class="sec-label">Analysis</div></div>
+  <div class="sgrid">
+    <div class="sc sc-g">
+      <div class="sc-glow"></div>
+      <div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="sc-val" id="sKept">0</div>
+      <div class="sc-lbl">Files Kept</div>
+    </div>
+    <div class="sc sc-r">
+      <div class="sc-glow"></div>
+      <div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff3d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+      <div class="sc-val" id="sSkip">0</div>
+      <div class="sc-lbl">Will Remove</div>
+    </div>
+    <div class="sc sc-c">
+      <div class="sc-glow"></div>
+      <div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#00c8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></div>
+      <div class="sc-val" id="sOrig">—</div>
+      <div class="sc-lbl">Original</div>
+    </div>
+    <div class="sc sc-a">
+      <div class="sc-glow"></div>
+      <div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+      <div class="sc-val" id="sComp">—</div>
+      <div class="sc-lbl">After Compress</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter -->
+<div class="sec" id="secFlt" style="display:none">
+  <div class="sec-hd"><div class="sec-label">Skip Patterns</div></div>
+  <div class="card">
+    <div class="flt-head" onclick="toggleFlt()">
+      <div class="flt-hl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00c8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <div class="flt-title">FILTER SETTINGS</div>
+      </div>
+      <div class="flt-btn" id="fltBtn">SHOW</div>
+    </div>
+    <div class="flt-body" id="fltBody">
+      <div class="tags" id="tagWrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="sec" id="secProg" style="display:none">
+  <div class="sec-hd"><div class="sec-label">Progress</div></div>
+  <div class="prog-card">
+    <div class="prog-top">
+      <div class="prog-pct" id="pPct">0%</div>
+      <div class="prog-status" id="pStatus">Memulai...</div>
+    </div>
+    <div class="prog-rail"><div class="prog-bar" id="pBar"></div></div>
+    <div class="prog-ticks" id="pTicks"></div>
+  </div>
+</div>
+
+<!-- Log -->
+<div class="sec" id="secLog" style="display:none">
+  <div class="sec-hd"><div class="sec-label">Removed Files</div></div>
+  <div class="log-card">
+    <div class="log-hd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      AKAN DIHAPUS
+      <div class="log-hd-count" id="logCount">0</div>
+    </div>
+    <div class="log-rows" id="logRows"></div>
+  </div>
+</div>
+
+<!-- Result -->
+<div class="sec" id="secResult" style="display:none">
+  <div class="sec-hd"><div class="sec-label">Result</div></div>
+  <div class="result-card">
+    <div class="res-body">
+      <div class="res-ring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="res-title">COMPRESS BERHASIL</div>
+      <div class="res-detail" id="rDetail">—</div>
+    </div>
+    <div class="res-foot">
+      <div class="res-save-lbl">HEMAT</div>
+      <div class="res-save-num" id="rSaved">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- Buttons — inline, no fixed footer -->
+<div class="btn-area">
+  <button class="btn btn-compress" id="btnC" onclick="doCompress()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    <span>COMPRESS ZIP</span>
+  </button>
+
+  <div class="dl-notice" id="dlNotice">
+    <div class="dl-nr">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="dl-nr-text" id="dlNText">Download dimulai</span>
+    </div>
+    <div class="dl-hint">Cek folder <strong>Downloads</strong> di perangkat. Jika tidak muncul otomatis, tap tombol Download lagi.</div>
+  </div>
+
+  <button class="btn btn-dl" id="btnDl" onclick="doDl()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span id="dlBtnTxt">DOWNLOAD CLEAN ZIP</span>
+  </button>
+</div>
+
+<!-- Info strip di bawah (bukan fixed) -->
+<div class="info-strip">
+  <div class="is-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <div class="is-text"><strong style="color:var(--tx)">Step 1</strong> &nbsp;Upload ZIP project Flutter</div>
+  </div>
+  <div class="is-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    <div class="is-text"><strong style="color:var(--tx)">Step 2</strong> &nbsp;Tap Compress ZIP — file cache &amp; build dibuang</div>
+  </div>
+  <div class="is-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <div class="is-text"><strong style="color:var(--tx)">Step 3</strong> &nbsp;Download &amp; kirim ke bot</div>
+  </div>
+</div>
+
+</div><!-- end .content -->
+</div><!-- end .page -->
 
 <script>
-/* ═══ CONFIG ═══ */
-var SKIP_PATTERNS=[
-  {pattern:'.dart_tool/',desc:'.dart_tool/',active:true},{pattern:'.gradle/',desc:'.gradle/',active:true},
-  {pattern:'.idea/',desc:'.idea/',active:true},{pattern:'build/',desc:'build/',active:true},
-  {pattern:'.git/',desc:'.git/',active:true},{pattern:'node_modules/',desc:'node_modules/',active:true},
-  {pattern:'.DS_Store',desc:'.DS_Store',active:true},{pattern:'ios/Pods/',desc:'ios/Pods/',active:true},
-  {pattern:'windows/flutter/generated_plugins/',desc:'win/plugins/',active:true},
-  {pattern:'linux/flutter/generated_plugins/',desc:'linux/plugins/',active:true},
-  {pattern:'.metadata',desc:'.metadata',active:true},
+/* ── DATA ── */
+const PATS = [
+  {p:'.dart_tool/', d:'.dart_tool/',   on:true},
+  {p:'.gradle/',   d:'.gradle/',       on:true},
+  {p:'.idea/',     d:'.idea/',         on:true},
+  {p:'build/',     d:'build/',         on:true},
+  {p:'.git/',      d:'.git/',          on:true},
+  {p:'node_modules/',d:'node_modules/',on:true},
+  {p:'.DS_Store',  d:'.DS_Store',      on:true},
+  {p:'ios/Pods/',  d:'ios/Pods/',      on:true},
+  {p:'windows/flutter/generated_plugins/',d:'win/generated_plugins/',on:true},
+  {p:'linux/flutter/generated_plugins/', d:'linux/generated_plugins/',on:true},
+  {p:'.metadata',  d:'.metadata',      on:true},
 ];
-var SKIP_EXT=['.iml','.class'];
-var MAX_FILE=50*1024*1024;
-var MAX_RECORDS=20;
-var origZip=null,origSize=0,compBlob=null,compSize=0,compName='',analysis=null;
-var blobUrl=null,currentUserId=null,currentUserName=null;
-var isTelegram=!!(window.Telegram&&window.Telegram.WebApp);
-var tgApp=isTelegram?window.Telegram.WebApp:null;
-if(tgApp){try{tgApp.ready()}catch(e){}}
+const SKIP_EXT=['.iml','.class'];
+const MAX_F=50*1024*1024;
 
-/* ═══ COMPRESS API (Server-side Storage) ═══ */
-/* 
-  ⚙️ KONFIGURASI:
-  - Kalau HTML di-host di server yang sama dengan API → kosongkan (otomatis pakai origin)
-  - Kalau HTML di GitHub Pages → isi URL server API kamu
-  Contoh: var COMPRESS_SERVER_URL = 'https://your-server.com';
-*/
-var COMPRESS_SERVER_URL = ''; // <-- isi URL server API kamu di sini kalau host di GitHub Pages
-var API_BASE = COMPRESS_SERVER_URL || window.location.origin;
+let oZip=null,oSize=0,cBlob=null,cSize=0,cName='';
 
-function apiSaveRecord(record,zipBlob){
-  return new Promise(function(resolve,reject){
-    var reader=new FileReader();
-    reader.onload=function(){
-      var base64=reader.result.split(',')[1];
-      fetch(API_BASE+'/api/compress/save',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          userId:record.userId,
-          fileName:record.fileName,
-          origSize:record.origSize,
-          compSize:record.compSize,
-          savedPct:record.savedPct,
-          createdAt:record.createdAt,
-          fileData:base64
-        })
-      }).then(function(r){return r.json()}).then(function(d){
-        if(d.ok)resolve(d.id);else reject(new Error(d.error||'Save failed'));
-      }).catch(reject);
-    };
-    reader.onerror=function(){reject(new Error('FileReader error'))};
-    reader.readAsDataURL(zipBlob);
-  });
-}
+/* ── TICKS ── */
+const NTICK=8;
+const tickEl=document.getElementById('pTicks');
+for(let i=0;i<NTICK;i++){const d=document.createElement('div');d.className='pt';d.id='t'+i;tickEl.appendChild(d)}
 
-function apiGetHistory(){
-  return fetch(API_BASE+'/api/compress/history?userId='+encodeURIComponent(currentUserId))
-    .then(function(r){return r.json()});
-}
-
-function apiDeleteRecord(id){
-  return fetch(API_BASE+'/api/compress/delete?id='+id+'&userId='+encodeURIComponent(currentUserId),{method:'DELETE'})
-    .then(function(r){return r.json()});
-}
-
-function apiClearHistory(){
-  return fetch(API_BASE+'/api/compress/clear',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({userId:currentUserId})
-  }).then(function(r){return r.json()});
-}
-
-function apiGetFileUrl(id){
-  return API_BASE+'/api/compress/file?id='+id+'&userId='+encodeURIComponent(currentUserId);
-}
-
-/* ═══ AUTH (FIXED: Telegram API Prioritas 1) ═══ */
-function checkSession(){
-  /* PRIORITAS 1: Kalau di Telegram, WAJIB pakai data Telegram API */
-  if(tgApp&&tgApp.initDataUnsafe&&tgApp.initDataUnsafe.user){
-    var u=tgApp.initDataUnsafe.user;
-    currentUserId=String(u.id);
-    currentUserName=u.first_name||u.username||String(u.id);
-    localStorage.setItem('zipcomp_user',JSON.stringify({id:currentUserId,name:currentUserName,source:'telegram'}));
-    activateSession();
-    return;
-  }
-  /* PRIORITAS 2: Cek localStorage (hanya browser biasa) */
-  var saved=localStorage.getItem('zipcomp_user');
-  if(saved){
-    try{
-      var d=JSON.parse(saved);
-      if(d.source==='telegram'){
-        localStorage.removeItem('zipcomp_user');
-        showLogin();
-        return;
-      }
-      currentUserId=d.id;currentUserName=d.name;
-      activateSession();return;
-    }catch(e){localStorage.removeItem('zipcomp_user')}
-  }
-  showLogin();
-}
-
-function showLogin(){
-  document.getElementById('loginOverlay').classList.remove('hidden');
-  if(tgApp&&tgApp.initDataUnsafe&&tgApp.initDataUnsafe.user){
-    var u=tgApp.initDataUnsafe.user;
-    document.getElementById('loginInput').value=u.id;
-    document.getElementById('loginInput').disabled=true;
-    document.getElementById('loginTgBadge').style.display='inline-flex';
-    document.getElementById('loginTgName').textContent=u.first_name||u.username||'Terverifikasi';
-  }else{
-    document.getElementById('loginInput').value='';
-    document.getElementById('loginInput').disabled=false;
-    document.getElementById('loginTgBadge').style.display='none';
-  }
-}
-
-function doLogin(){
-  var input=document.getElementById('loginInput').value.trim();
-  if(!input){toast('err','Gagal','Masukkan Telegram ID');return}
-  currentUserId=input;currentUserName=input;
-  localStorage.setItem('zipcomp_user',JSON.stringify({id:currentUserId,name:currentUserName,source:'manual'}));
-  activateSession();toast('ok','Selamat Datang','ID: '+currentUserId);
-}
-
-function activateSession(){
-  document.getElementById('loginOverlay').classList.add('hidden');
-  document.getElementById('navUserId').textContent=currentUserId;
-  document.getElementById('navAvatar').textContent=(currentUserName||currentUserId).charAt(0).toUpperCase();
-}
-
-function doLogout(){
-  if(!confirm('Keluar dari sesi?'))return;
-  localStorage.removeItem('zipcomp_user');
-  currentUserId=null;currentUserName=null;
-  location.reload();
-}
-
-/* ═══ HISTORY ═══ */
-function openHist(){document.getElementById('histOverlay').classList.add('show');refreshHist()}
-function closeHist(){document.getElementById('histOverlay').classList.remove('show')}
-function closeHistIfBg(e){if(e.target===document.getElementById('histOverlay'))closeHist()}
-
-async function refreshHist(){
-  var list=document.getElementById('histList');
-  try{
-    var records=await apiGetHistory();
-    if(!Array.isArray(records))records=[];
-    records.sort(function(a,b){return b.id-a.id});
-    document.getElementById('histCount').textContent=records.length;
-    if(records.length===0){
-      list.innerHTML='<div class="hist-empty"><div class="hist-empty-icon">&#128230;</div><div class="hist-empty-text">Belum ada riwayat compress.<br>Upload dan compress file ZIP untuk memulai.</div></div>';
-      return;
-    }
-    var h='';
-    records.forEach(function(r){
-      var dateStr=new Date(r.createdAt).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-      h+='<div class="hist-card" id="hcard-'+r.id+'">';
-      h+='<div class="hist-card-top"><div class="hist-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
-      h+='<div class="hist-card-info"><div class="hist-card-name">'+escHtml(r.fileName)+'</div>';
-      h+='<div class="hist-card-meta">'+fmtSize(r.origSize)+' &rarr; '+fmtSize(r.compSize)+'</div>';
-      if(r.savedPct>0)h+='<div class="hist-card-saved">Hemat '+r.savedPct+'%</div>';
-      h+='<div class="hist-card-date">'+dateStr+'</div></div></div>';
-      h+='<div class="hist-card-btns">';
-      h+='<button class="hist-card-btn dl" onclick="histDownload('+r.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save</button>';
-      h+='<button class="hist-card-btn del" onclick="histDelete('+r.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Hapus</button>';
-      h+='</div></div>';
-    });
-    list.innerHTML=h;
-  }catch(e){list.innerHTML='<div class="hist-empty"><div class="hist-empty-text">Error: '+e.message+'</div></div>'}
-}
-
-async function histDownload(id){
-  try{
-    var records=await apiGetHistory();
-    var record=records.find(function(r){return r.id===id});
-    if(!record){toast('err','Error','Record tidak ditemukan');return}
-    compName=record.fileName;compSize=record.compSize;
-    compBlob=null;
-    // Fetch file dari server
-    var resp=await fetch(apiGetFileUrl(id));
-    if(!resp.ok)throw new Error('File tidak ditemukan di server');
-    compBlob=await resp.blob();
-    openSaveSheet();
-  }catch(e){toast('err','Error',e.message)}
-}
-
-async function histDelete(id){
-  if(!confirm('Hapus riwayat ini?'))return;
-  try{
-    await apiDeleteRecord(id);
-    var card=document.getElementById('hcard-'+id);
-    if(card){card.style.opacity='0';card.style.transform='translateX(40px)';card.style.transition='all 0.3s';setTimeout(function(){refreshHist()},300)}
-    else{refreshHist()}
-    toast('ok','Dihapus','Riwayat berhasil dihapus');
-  }catch(e){toast('err','Error',e.message)}
-}
-
-async function clearAllHist(){
-  if(!confirm('Hapus semua riwayat compress? File yang sudah disimpan di perangkat tidak ikut terhapus.'))return;
-  try{await apiClearHistory();refreshHist();toast('ok','Dihapus','Semua riwayat berhasil dihapus')}catch(e){toast('err','Error',e.message)}
-}
-
-function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-
-/* ═══ TOAST ═══ */
-function toast(type,title,msg,dur){
-  dur=dur||3000;var c=document.getElementById('toastWrap');
-  var t=document.createElement('div');t.className='toast';
-  var icons={
-    ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    err:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    inf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
-    wrn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-  };
-  t.innerHTML='<div class="toast-ic '+type+'">'+icons[type]+'</div><div class="toast-body"><div class="toast-t">'+title+'</div><div class="toast-m">'+msg+'</div></div><div class="toast-bar '+type+'" style="animation-duration:'+(dur/1000)+'s"></div>';
-  c.appendChild(t);
-  setTimeout(function(){t.classList.add('out');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},300)},dur);
-}
-
-/* ═══ INIT CHIPS ═══ */
-(function(){
-  var body=document.getElementById('filterBody');
-  SKIP_PATTERNS.forEach(function(p,i){
-    var chip=document.createElement('div');
-    chip.className='filter-chip'+(p.active?' on':'');
-    chip.textContent=p.desc;
-    chip.onclick=function(e){e.stopPropagation();SKIP_PATTERNS[i].active=!SKIP_PATTERNS[i].active;chip.classList.toggle('on')};
-    body.appendChild(chip);
-  });
-})();
-
-function toggleFilter(){var b=document.getElementById('filterBody'),btn=document.getElementById('filterToggle');b.classList.toggle('show');btn.textContent=b.classList.contains('show')?'Hide':'Show'}
-
-/* ═══ FILE UPLOAD ═══ */
-document.getElementById('fileInput').addEventListener('change',async function(e){
-  var file=e.target.files[0];if(!file)return;
-  if(!file.name.endsWith('.zip')){toast('err','Invalid File','Hanya file .zip yang diperbolehkan');return}
-  var area=document.getElementById('uploadArea');area.classList.add('has-file');
-  document.getElementById('uploadTitle').textContent=file.name;
-  document.getElementById('uploadDesc').textContent=fmtSize(file.size);
-  document.getElementById('uploadChange').style.display='block';
-  document.getElementById('uploadSvg').outerHTML='<svg id="uploadSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-  var fc=document.getElementById('fileCard');fc.classList.add('show');
-  document.getElementById('cardName').textContent=file.name;
-  document.getElementById('cardSize').textContent=fmtSize(file.size);
-  document.getElementById('rowOriginal').textContent=fmtSize(file.size);
-  document.getElementById('rowStatus').textContent='Analyzing...';
-  document.getElementById('rowStatus').className='file-row-val c-warn';
-  document.getElementById('statusDot').className='file-card-dot yellow';
-  document.getElementById('filterSection').classList.add('show');
-  origSize=file.size;
-  try{origZip=await JSZip.loadAsync(file);await analyzeZip();toast('ok','File Loaded',file.name)}
-  catch(err){document.getElementById('rowStatus').textContent='Error: '+err.message;document.getElementById('rowStatus').className='file-row-val c-danger';document.getElementById('statusDot').className='file-card-dot red';toast('err','Read Error',err.message)}
+/* ── TAGS ── */
+const tagWrap=document.getElementById('tagWrap');
+PATS.forEach((p,i)=>{
+  const t=document.createElement('div');
+  t.className='tag'+(p.on?' on':'');
+  t.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>${p.d}`;
+  t.onclick=e=>{e.stopPropagation();PATS[i].on=!PATS[i].on;t.classList.toggle('on')};
+  tagWrap.appendChild(t);
 });
 
-/* ═══ ANALYZE ═══ */
-async function analyzeZip(){
-  var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
-  var kept=0,skipped=0,skippedFiles=[];
-  for(var i=0;i<entries.length;i++){if(shouldSkip(entries[i].path)){skipped++;skippedFiles.push({path:entries[i].path,reason:skipReason(entries[i].path)})}else{kept++}}
-  analysis={kept:kept,skipped:skipped,skippedFiles:skippedFiles,total:entries.length};
-  var dot=document.getElementById('statusDot'),st=document.getElementById('rowStatus');
-  if(origSize>20*1024*1024){st.textContent='Perlu compress (>20MB)';st.className='file-row-val c-danger';dot.className='file-card-dot red'}
-  else if(origSize>15*1024*1024){st.textContent='Dianjurkan compress';st.className='file-row-val c-warn';dot.className='file-card-dot yellow'}
-  else{st.textContent='Ukuran OK';st.className='file-row-val c-accent';dot.className='file-card-dot green'}
-  document.getElementById('statsRow').classList.add('show');
-  document.getElementById('sKept').textContent=kept;document.getElementById('sSkipped').textContent=skipped;
-  document.getElementById('sOriginal').textContent=fmtSize(origSize);
-  if(skippedFiles.length>0){
-    var log=document.getElementById('skipLog');log.classList.add('show');
-    var list=document.getElementById('skipList');list.innerHTML='';
-    var show=skippedFiles.slice(0,50);
-    for(var j=0;j<show.length;j++){var d=document.createElement('div');d.className='skip-item';d.innerHTML='<span class="skip-path">'+show[j].path+'</span><span class="skip-reason">'+show[j].reason+'</span>';list.appendChild(d)}
-    if(skippedFiles.length>50){var m=document.createElement('div');m.className='skip-item';m.innerHTML='<span class="skip-path">...dan '+(skippedFiles.length-50)+' file lain</span>';list.appendChild(m)}
-  }
-  if(skipped>0)document.getElementById('btnGo').classList.add('show');
-  else{st.textContent='Sudah bersih!';st.className='file-row-val c-accent';dot.className='file-card-dot green'}
+function toggleFlt(){
+  const b=document.getElementById('fltBody');
+  b.classList.toggle('open');
+  document.getElementById('fltBtn').textContent=b.classList.contains('open')?'HIDE':'SHOW';
 }
 
-/* ═══ SKIP LOGIC ═══ */
-function shouldSkip(p){
-  for(var i=0;i<SKIP_PATTERNS.length;i++){var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return true}else{if(p===pat||p.split('/').indexOf(pat)!==-1)return true}}
-  var ext=p.substring(p.lastIndexOf('.'));if(SKIP_EXT.indexOf(ext)!==-1)return true;if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return true;return false;
-}
-function skipReason(p){
-  for(var i=0;i<SKIP_PATTERNS.length;i++){var s=SKIP_PATTERNS[i];if(!s.active)continue;var pat=s.pattern;if(pat.endsWith('/')){if(p.startsWith(pat)||p.split('/').indexOf(pat.slice(0,-1))!==-1)return s.desc}else{if(p===pat||p.split('/').indexOf(pat)!==-1)return s.desc}}
-  var ext=p.substring(p.lastIndexOf('.'));if(SKIP_EXT.indexOf(ext)!==-1)return 'Ext '+ext;if(ext==='.lock'&&!p.endsWith('pubspec.lock'))return 'Lock file';return 'Unknown';
-}
+/* ── FILE INPUT ── */
+document.getElementById('fi').addEventListener('change',async e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  if(!f.name.toLowerCase().endsWith('.zip')){alert('Harus file .zip');return;}
 
-/* ═══ COMPRESS ═══ */
-async function startCompress(){
-  if(!origZip)return;
-  var btn=document.getElementById('btnGo');btn.disabled=true;btn.querySelector('span').textContent='Compressing...';
-  document.getElementById('progressBox').classList.add('show');
-  toast('inf','Compressing','Memproses file...',4000);
+  const zone=document.getElementById('uzone');
+  zone.classList.add('done');
+  document.getElementById('uzSvg').outerHTML=
+    `<svg id="uzSvg" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  document.getElementById('uzTitle').textContent=f.name.length>28?f.name.slice(0,26)+'…':f.name;
+  document.getElementById('uzSub').textContent=fmtSz(f.size)+' · Siap dianalisis';
+
+  show('secInfo');show('secFlt');
+  document.getElementById('vName').textContent=f.name.length>32?f.name.slice(0,30)+'…':f.name;
+  document.getElementById('vSize').textContent=fmtSz(f.size);
+  setStatus('Menganalisis...','');
+  oSize=f.size;
   try{
-    var newZip=new JSZip();var entries=[];origZip.forEach(function(path,entry){if(!entry.dir)entries.push({path:path,entry:entry})});
-    var processed=0,total=entries.length,kept=0,skipped=0;
-    for(var i=0;i<entries.length;i++){
-      var item=entries[i];var pct=Math.round((processed/total)*100);
-      setProgress(pct,'Processing: '+item.path.split('/').pop()+' ('+(processed+1)+'/'+total+')');
-      if(shouldSkip(item.path)){skipped++;processed++;continue}
-      var data=await item.entry.async('arraybuffer');
-      if(data.byteLength>MAX_FILE){skipped++;processed++;continue}
-      newZip.file(item.path,data);kept++;processed++;
-      if(processed%10===0)await new Promise(function(r){setTimeout(r,0)});
+    oZip=await JSZip.loadAsync(f);
+    await doAnalyze();
+  }catch(er){setStatus('Error: '+er.message,'r')}
+});
+
+/* ── ANALYZE ── */
+async function doAnalyze(){
+  const ents=[];
+  oZip.forEach((p,e)=>{if(!e.dir)ents.push({path:p,entry:e})});
+  let kept=0,skip=0;const skf=[];
+  for(const {path} of ents){
+    if(chkSkip(path)){skip++;skf.push({path,r:skipReason(path)})}
+    else kept++;
+  }
+  if(oSize>20*1024*1024) setStatus('Perlu compress  ·  >20 MB','r');
+  else if(oSize>15*1024*1024) setStatus('Dianjurkan compress  ·  >15 MB','a');
+  else setStatus('Ukuran OK','g');
+
+  show('secStats');
+  document.getElementById('sKept').textContent=kept;
+  document.getElementById('sSkip').textContent=skip;
+  document.getElementById('sOrig').textContent=fmtSz(oSize);
+  document.getElementById('sComp').textContent='—';
+
+  if(skf.length>0){
+    show('secLog');
+    document.getElementById('logCount').textContent=skf.length;
+    const rows=document.getElementById('logRows');
+    rows.innerHTML='';
+    skf.slice(0,60).forEach(f=>{
+      rows.innerHTML+=`<div class="lrow">
+        <div class="lrow-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div class="lrow-path">${f.path}</div>
+        <div class="lrow-tag">${f.r}</div>
+      </div>`;
+    });
+    if(skf.length>60){
+      rows.innerHTML+=`<div class="lrow"><div class="lrow-path" style="color:var(--tx3)">…dan ${skf.length-60} file lainnya</div></div>`;
     }
-    setProgress(90,'Generating ZIP...');
-    compBlob=await newZip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){setProgress(90+Math.round(m.percent/10),'Compressing data...')});
-    compSize=compBlob.size;var baseName=origZip.name||'project';compName=baseName.replace(/\.zip$/i,'-clean.zip');
-    setProgress(100,'Selesai!');
-    document.getElementById('sCompressed').textContent=fmtSize(compSize);
-    var saved=origSize-compSize;var savedPct=Math.round((saved/origSize)*100);
-    document.getElementById('resultBox').classList.add('show');
-    document.getElementById('resultP').textContent=kept+' files kept, '+skipped+' files removed';
-    var rs=document.getElementById('resultSave');
-    if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
-
-    try{
-      await apiSaveRecord({userId:currentUserId,fileName:compName,origSize:origSize,compSize:compSize,savedPct:savedPct,createdAt:new Date().toISOString()},compBlob);
-      toast('inf','Tersimpan','File ditambahkan ke riwayat (server)');
-    }catch(dbErr){
-      console.warn('[COMPRESS] Save to server failed:',dbErr.message);
-      toast('wrn','Peringatan','File di-compress tapi gagal disimpan ke server');
-    }
-
-    var sb=document.getElementById('btnShare');sb.classList.add('show');
-    document.getElementById('btnShareText').textContent='Save File ('+fmtSize(compSize)+')';
-    btn.classList.remove('show');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';
-    toast('ok','Berhasil','Tap "Save File" untuk menyimpan');
-  }catch(err){console.error(err);setProgress(0,'Error');btn.disabled=false;btn.querySelector('span').textContent='Compress ZIP';toast('err','Failed',err.message,5000)}
-}
-
-/* ═══ SAVE SHEET ═══ */
-function openSaveSheet(){
-  if(!compBlob){toast('err','Error','Tidak ada file');return}
-  if(blobUrl)URL.revokeObjectURL(blobUrl);
-  blobUrl=URL.createObjectURL(compBlob);
-  var sheet=document.getElementById('saveSheet');
-  var overlay=document.getElementById('saveOverlay');overlay.classList.add('show');
-  var h='<div class="save-handle"></div><div class="save-sheet-title">Simpan File</div>';
-  h+='<div class="save-fileinfo-wrap"><div class="save-fileinfo">'+compName+' &mdash; '+fmtSize(compSize)+'</div></div>';
-  h+='<div class="save-methods">';
-  h+='<a class="save-mbtn primary" href="'+blobUrl+'" download="'+compName+'" onclick="toast(\'ok\',\'Downloading...\',\'Jika gagal, long-press dan pilih Save link\')">';
-  h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>';
-  h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Tap to Download</span><span class="save-mbtn-desc">Tap langsung untuk download. Long-press dan "Save link" jika tidak jalan.</span></div></a>';
-  if(isTelegram){
-    h+='<button class="save-mbtn tg" onclick="openInExternalBrowser()">';
-    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Open in Browser</span><span class="save-mbtn-desc">Buka di Chrome untuk download lebih mudah</span></div></button>';
   }
-  if(navigator.share){
-    h+='<button class="save-mbtn secondary" onclick="tryWebShare()">';
-    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Share File</span><span class="save-mbtn-desc">Buka share sheet — pilih Save to Files</span></div></button>';
-  }
-  if(window.showSaveFilePicker){
-    h+='<button class="save-mbtn secondary" onclick="trySaveAs()">';
-    h+='<div class="save-mbtn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>';
-    h+='<div class="save-mbtn-body"><span class="save-mbtn-name">Save As...</span><span class="save-mbtn-desc">Pilih lokasi folder (Chrome desktop)</span></div></button>';
-  }
-  h+='</div><button class="save-cancel" onclick="closeSaveSheet()">Batal</button>';
-  sheet.innerHTML=h;
+
+  if(skip>0){document.getElementById('btnC').classList.add('vis')}
+  else{setStatus('Sudah bersih','g')}
 }
 
-async function openInExternalBrowser(){
-  try{var cache=await caches.open('zipcomp-temp');var resp=new Response(compBlob,{headers:{'Content-Type':'application/zip','X-Filename':compName}});await cache.put('/compressed-result',resp)}catch(e){}
-  if(tgApp&&tgApp.openLink){tgApp.openLink(window.location.href)}else{window.open(window.location.href,'_blank')}
-  closeSaveSheet();toast('inf','Browser Dibuka','Cari banner file di Chrome');
-}
+/* ── COMPRESS ── */
+async function doCompress(){
+  if(!oZip)return;
+  const btn=document.getElementById('btnC');
+  btn.disabled=true;
+  btn.querySelector('span').textContent='COMPRESSING...';
+  document.getElementById('dlNotice').classList.remove('vis');
+  show('secProg');
 
-async function tryWebShare(){
-  var file=new File([compBlob],compName,{type:'application/zip'});
-  try{await navigator.share({files:[file],title:compName});toast('ok','Berhasil!','File di-share');closeSaveSheet()}
-  catch(err){if(err.name!=='AbortError')toast('wrn','Share Gagal',err.message)}
-}
-
-async function trySaveAs(){
   try{
-    var handle=await window.showSaveFilePicker({suggestedName:compName,types:[{description:'ZIP',accept:{'application/zip':['.zip']}}]});
-    var w=await handle.createWritable();await w.write(compBlob);await w.close();
-    toast('ok','Berhasil!','File disimpan');closeSaveSheet();
-  }catch(err){if(err.name!=='AbortError')toast('wrn','Save Gagal',err.message)}
+    const nz=new JSZip();
+    const ents=[];
+    oZip.forEach((p,e)=>{if(!e.dir)ents.push({path:p,entry:e})});
+    let done=0,kept=0,skip=0;const tot=ents.length;
+
+    for(const {path,entry} of ents){
+      setP(Math.round(done/tot*85),path.split('/').pop()+`  (${done+1}/${tot})`);
+      if(chkSkip(path)){skip++;done++;continue;}
+      const data=await entry.async('arraybuffer');
+      if(data.byteLength>MAX_F){skip++;done++;continue;}
+      nz.file(path,data);
+      kept++;done++;
+      if(done%10===0)await new Promise(r=>setTimeout(r,0));
+    }
+    setP(88,'Generating ZIP…');
+    cBlob=await nz.generateAsync(
+      {type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},
+      m=>setP(88+Math.round(m.percent/100*11),'Compressing data…')
+    );
+    cSize=cBlob.size;
+    const base=(oZip.name||'project').replace(/\s/g,'-');
+    cName=base.replace(/\.zip$/i,'')+'-clean.zip';
+    setP(100,'Done!');
+    document.getElementById('sComp').textContent=fmtSz(cSize);
+
+    const saved=oSize-cSize;
+    const pct=Math.round(saved/oSize*100);
+    show('secResult');
+    document.getElementById('rDetail').innerHTML=
+      `${kept} file disimpan &nbsp;·&nbsp; ${skip} file dihapus<br>${fmtSz(oSize)} &rarr; ${fmtSz(cSize)}`;
+    document.getElementById('rSaved').textContent=
+      saved>0?`${fmtSz(saved)} (${pct}%)`:'Tidak ada';
+
+    const dlBtn=document.getElementById('btnDl');
+    dlBtn.classList.add('vis');
+    document.getElementById('dlBtnTxt').textContent=`DOWNLOAD  ·  ${fmtSz(cSize)}`;
+
+    btn.classList.remove('vis');
+    btn.disabled=false;
+    btn.querySelector('span').textContent='COMPRESS ZIP';
+
+  }catch(er){
+    setP(0,'Error: '+er.message);
+    btn.disabled=false;
+    btn.querySelector('span').textContent='COMPRESS ZIP';
+  }
 }
 
-function closeSaveSheet(){document.getElementById('saveOverlay').classList.remove('show')}
+/* ── DOWNLOAD ── */
+function doDl(){
+  if(!cBlob)return;
+  const url=URL.createObjectURL(cBlob);
+  const a=document.createElement('a');
+  a.href=url;a.download=cName;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),8000);
 
-/* ═══ HELPERS ═══ */
-function fmtSize(b){if(b<1024)return b+' B';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(2)+' MB'}
-function setProgress(pct,txt){document.getElementById('progPct').textContent=pct+'%';document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=txt}
+  /* feedback */
+  const btn=document.getElementById('btnDl');
+  const orig=document.getElementById('dlBtnTxt').textContent;
+  document.getElementById('dlBtnTxt').textContent='DOWNLOADING…';
+  btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('dlBtnTxt').textContent=orig;
+    btn.disabled=false;
+  },3000);
 
-/* ═══ INIT ═══ */
-checkSession();
+  const notice=document.getElementById('dlNotice');
+  document.getElementById('dlNText').textContent=`"${cName}" (${fmtSz(cSize)}) — download dimulai`;
+  notice.classList.add('vis');
+  /* scroll biar notice keliatan */
+  setTimeout(()=>notice.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+/* ── HELPERS ── */
+function show(id){document.getElementById(id).style.display='block'}
+function fmtSz(b){
+  if(b<1024)return b+' B';
+  if(b<1048576)return(b/1024).toFixed(1)+' KB';
+  return(b/1048576).toFixed(2)+' MB';
+}
+function setStatus(t,c){
+  const el=document.getElementById('vStatus');
+  el.textContent=t;el.className='ival'+(c?' '+c:'');
+}
+function setP(pct,txt){
+  document.getElementById('pPct').textContent=pct+'%';
+  const bar=document.getElementById('pBar');
+  bar.style.width=pct+'%';
+  bar.classList.toggle('active',pct>0&&pct<100);
+  document.getElementById('pStatus').textContent=txt;
+  for(let i=0;i<NTICK;i++){
+    const el=document.getElementById('t'+i);
+    if(el)el.classList.toggle('lit',pct>=(i+1)*(100/NTICK));
+  }
+}
+function chkSkip(fp){
+  for(const p of PATS){
+    if(!p.on)continue;
+    if(p.p.endsWith('/')){
+      if(fp.startsWith(p.p)||fp.split('/').includes(p.p.slice(0,-1)))return true;
+    }else{
+      if(fp===p.p||fp.split('/').includes(p.p))return true;
+    }
+  }
+  const ext=fp.slice(fp.lastIndexOf('.'));
+  if(SKIP_EXT.includes(ext))return true;
+  if(ext==='.lock'&&!fp.endsWith('pubspec.lock'))return true;
+  return false;
+}
+function skipReason(fp){
+  for(const p of PATS){
+    if(!p.on)continue;
+    if(p.p.endsWith('/')){
+      if(fp.startsWith(p.p)||fp.split('/').includes(p.p.slice(0,-1)))return p.d;
+    }else{
+      if(fp===p.p||fp.split('/').includes(p.p))return p.d;
+    }
+  }
+  const ext=fp.slice(fp.lastIndexOf('.'));
+  if(SKIP_EXT.includes(ext))return ext;
+  if(ext==='.lock')return 'lock';
+  return 'other';
+}
 </script>
 </body>
 </html>

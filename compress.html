@@ -382,89 +382,55 @@ var isTelegram=!!(window.Telegram&&window.Telegram.WebApp);
 var tgApp=isTelegram?window.Telegram.WebApp:null;
 if(tgApp){try{tgApp.ready()}catch(e){}}
 
-/* ═══ INDEXEDDB ═══ */
-var DB_NAME='ZipCompressDB',DB_VER=1,STORE='history';
-function openDB(){
+/* ═══ COMPRESS API (Server-side Storage) ═══ */
+var API_BASE=window.location.origin;
+
+function apiSaveRecord(record,zipBlob){
   return new Promise(function(resolve,reject){
-    var req=indexedDB.open(DB_NAME,DB_VER);
-    req.onupgradeneeded=function(e){
-      var db=e.target.result;
-      if(!db.objectStoreNames.contains(STORE)){
-        var s=db.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});
-        s.createIndex('userId','userId',{unique:false});
-      }
+    var reader=new FileReader();
+    reader.onload=function(){
+      var base64=reader.result.split(',')[1];
+      fetch(API_BASE+'/api/compress/save',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          userId:record.userId,
+          fileName:record.fileName,
+          origSize:record.origSize,
+          compSize:record.compSize,
+          savedPct:record.savedPct,
+          createdAt:record.createdAt,
+          fileData:base64
+        })
+      }).then(function(r){return r.json()}).then(function(d){
+        if(d.ok)resolve(d.id);else reject(new Error(d.error||'Save failed'));
+      }).catch(reject);
     };
-    req.onsuccess=function(e){resolve(e.target.result)};
-    req.onerror=function(e){reject(e.target.error)};
+    reader.onerror=function(){reject(new Error('FileReader error'))};
+    reader.readAsDataURL(zipBlob);
   });
 }
-function dbAdd(record){
-  return openDB().then(function(db){
-    return new Promise(function(resolve,reject){
-      var tx=db.transaction(STORE,'readwrite');
-      var store=tx.objectStore(STORE);
-      var idx=store.index('userId');
-      var getAll=idx.getAll(currentUserId);
-      getAll.onsuccess=function(){
-        var existing=getAll.result;
-        if(existing.length>=MAX_RECORDS){
-          existing.sort(function(a,b){return a.id-b.id});
-          var toDelete=existing.slice(0,existing.length-MAX_RECORDS+1);
-          toDelete.forEach(function(r){store.delete(r.id)});
-        }
-        var addReq=store.add(record);
-        addReq.onsuccess=function(){resolve(addReq.result)};
-        addReq.onerror=function(){reject(addReq.error)};
-      };
-    });
-  });
+
+function apiGetHistory(){
+  return fetch(API_BASE+'/api/compress/history?userId='+encodeURIComponent(currentUserId))
+    .then(function(r){return r.json()});
 }
-function dbGetAll(){
-  return openDB().then(function(db){
-    return new Promise(function(resolve,reject){
-      var tx=db.transaction(STORE,'readonly');
-      var idx=tx.objectStore(STORE).index('userId');
-      var req=idx.getAll(currentUserId);
-      req.onsuccess=function(){resolve(req.result.sort(function(a,b){return b.id-a.id}))};
-      req.onerror=function(){reject(req.error)};
-    });
-  });
+
+function apiDeleteRecord(id){
+  return fetch(API_BASE+'/api/compress/delete?id='+id+'&userId='+encodeURIComponent(currentUserId),{method:'DELETE'})
+    .then(function(r){return r.json()});
 }
-function dbGet(id){
-  return openDB().then(function(db){
-    return new Promise(function(resolve,reject){
-      var tx=db.transaction(STORE,'readonly');
-      var req=tx.objectStore(STORE).get(id);
-      req.onsuccess=function(){resolve(req.result)};
-      req.onerror=function(){reject(req.error)};
-    });
-  });
+
+function apiClearHistory(){
+  return fetch(API_BASE+'/api/compress/clear',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({userId:currentUserId})
+  }).then(function(r){return r.json()});
 }
-function dbDelete(id){
-  return openDB().then(function(db){
-    return new Promise(function(resolve,reject){
-      var tx=db.transaction(STORE,'readwrite');
-      var req=tx.objectStore(STORE).delete(id);
-      req.onsuccess=function(){resolve()};
-      req.onerror=function(){reject(req.error)};
-    });
-  });
-}
-function dbClearUser(){
-  return openDB().then(function(db){
-    return new Promise(function(resolve,reject){
-      var tx=db.transaction(STORE,'readwrite');
-      var store=tx.objectStore(STORE);
-      var idx=store.index('userId');
-      var req=idx.openCursor(IDBKeyRange.only(currentUserId));
-      req.onsuccess=function(e){
-        var cursor=e.target.result;
-        if(cursor){cursor.delete();cursor.continue()}
-        else{resolve()}
-      };
-      req.onerror=function(){reject(req.error)};
-    });
-  });
+
+function apiGetFileUrl(id){
+  return API_BASE+'/api/compress/file?id='+id+'&userId='+encodeURIComponent(currentUserId);
 }
 
 /* ═══ AUTH (FIXED: Telegram API Prioritas 1) ═══ */
@@ -539,7 +505,9 @@ function closeHistIfBg(e){if(e.target===document.getElementById('histOverlay'))c
 async function refreshHist(){
   var list=document.getElementById('histList');
   try{
-    var records=await dbGetAll();
+    var records=await apiGetHistory();
+    if(!Array.isArray(records))records=[];
+    records.sort(function(a,b){return b.id-a.id});
     document.getElementById('histCount').textContent=records.length;
     if(records.length===0){
       list.innerHTML='<div class="hist-empty"><div class="hist-empty-icon">&#128230;</div><div class="hist-empty-text">Belum ada riwayat compress.<br>Upload dan compress file ZIP untuk memulai.</div></div>';
@@ -565,9 +533,15 @@ async function refreshHist(){
 
 async function histDownload(id){
   try{
-    var record=await dbGet(id);
-    if(!record||!record.blob){toast('err','Error','File tidak ditemukan di database');return}
-    compBlob=record.blob;compSize=record.compSize;compName=record.fileName;
+    var records=await apiGetHistory();
+    var record=records.find(function(r){return r.id===id});
+    if(!record){toast('err','Error','Record tidak ditemukan');return}
+    compName=record.fileName;compSize=record.compSize;
+    compBlob=null;
+    // Fetch file dari server
+    var resp=await fetch(apiGetFileUrl(id));
+    if(!resp.ok)throw new Error('File tidak ditemukan di server');
+    compBlob=await resp.blob();
     openSaveSheet();
   }catch(e){toast('err','Error',e.message)}
 }
@@ -575,7 +549,7 @@ async function histDownload(id){
 async function histDelete(id){
   if(!confirm('Hapus riwayat ini?'))return;
   try{
-    await dbDelete(id);
+    await apiDeleteRecord(id);
     var card=document.getElementById('hcard-'+id);
     if(card){card.style.opacity='0';card.style.transform='translateX(40px)';card.style.transition='all 0.3s';setTimeout(function(){refreshHist()},300)}
     else{refreshHist()}
@@ -585,7 +559,7 @@ async function histDelete(id){
 
 async function clearAllHist(){
   if(!confirm('Hapus semua riwayat compress? File yang sudah disimpan di perangkat tidak ikut terhapus.'))return;
-  try{await dbClearUser();refreshHist();toast('ok','Dihapus','Semua riwayat berhasil dihapus')}catch(e){toast('err','Error',e.message)}
+  try{await apiClearHistory();refreshHist();toast('ok','Dihapus','Semua riwayat berhasil dihapus')}catch(e){toast('err','Error',e.message)}
 }
 
 function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
@@ -705,10 +679,11 @@ async function startCompress(){
     if(saved>0){rs.textContent='Hemat '+fmtSize(saved)+' ('+savedPct+'%)';rs.className='result-save'}else{rs.textContent='Tidak ada penghematan';rs.className='result-save muted'}
 
     try{
-      await dbAdd({userId:currentUserId,fileName:compName,origSize:origSize,compSize:compSize,savedPct:savedPct,createdAt:new Date().toISOString(),blob:compBlob});
-      toast('inf','Tersimpan','File ditambahkan ke riwayat');
+      await apiSaveRecord({userId:currentUserId,fileName:compName,origSize:origSize,compSize:compSize,savedPct:savedPct,createdAt:new Date().toISOString()},compBlob);
+      toast('inf','Tersimpan','File ditambahkan ke riwayat (server)');
     }catch(dbErr){
-      try{await dbAdd({userId:currentUserId,fileName:compName,origSize:origSize,compSize:compSize,savedPct:savedPct,createdAt:new Date().toISOString(),blob:null})}catch(e2){}
+      console.warn('[COMPRESS] Save to server failed:',dbErr.message);
+      toast('wrn','Peringatan','File di-compress tapi gagal disimpan ke server');
     }
 
     var sb=document.getElementById('btnShare');sb.classList.add('show');

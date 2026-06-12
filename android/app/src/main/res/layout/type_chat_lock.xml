@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:keepScreenOn="true">
+
+    <LinearLayout
+        android:id="@+id/chat_header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#990000"
+        android:padding="15dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        
+        <ProgressBar
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="12dp"
+            android:indeterminateTint="#FFFFFF"
+            style="?android:attr/progressBarStyleSmall"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TERMINAL: INTERROGATION ACTIVE"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.1"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/chat_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_input_bar"
+        android:layout_below="@id/chat_header_bar"
+        android:padding="12dp"
+        android:fadeScrollbars="false">
+
+        <LinearLayout
+            android:id="@+id/chat_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:divider="@android:color/transparent"
+            android:showDividers="middle"
+            android:dividerPadding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="[SYSTEM]: Auth success. Secure channel established."
+                android:textColor="#00FF00"
+                android:textSize="13sp"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="8dp"
+                android:shadowColor="#00FF00"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="5"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottom_input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#121212"
+        android:padding="10dp"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/target_message_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Type response to admin..."
+            android:textColor="#FFFFFF"
+            android:textColorHint="#444444"
+            android:background="@null"
+            android:padding="12dp"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:inputType="textLongMessage"
+            android:maxLines="4"/>
+
+        <ImageButton
+            android:id="@+id/btn_send_reply"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@android:drawable/ic_menu_send"
+            android:background="@null"
+            android:contentDescription="Send"
+            android:scaleType="centerInside"
+            android:tint="#FF0000"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/bottom_input_bar"
+        android:background="#33FF0000"/>
+
+</RelativeLayout>

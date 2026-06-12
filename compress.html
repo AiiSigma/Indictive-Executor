@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>ZIP Compressor · Flutter Build Bot</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 /* ───────────── RESET ───────────── */
@@ -883,141 +882,30 @@ async function doCompress(){
   }
 }
 
-/* ── DETECT TELEGRAM WEBVIEW ── */
-function isTgWebView(){
-  // Cek via Telegram.WebApp object
-  if(window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.initData)return true;
-  // Fallback: cek user agent
-  const ua=navigator.userAgent||'';
-  return /Telegram|TelegramBot/i.test(ua)||
-    (typeof TelegramWebviewProxy!=='undefined');
-}
-
 /* ── DOWNLOAD ── */
-async function doDl(){
+function doDl(){
   if(!cBlob)return;
-
   const btn=document.getElementById('btnDl');
   const origTxt=document.getElementById('dlBtnTxt').textContent;
-  document.getElementById('dlBtnTxt').textContent='MENYIAPKAN…';
-  btn.disabled=true;
 
-  try{
-    if(isTgWebView()){
-      // ── TELEGRAM PATH: konversi ke base64 data URL lalu buka di browser luar
-      await dlViaTelegram();
-    } else {
-      // ── BROWSER BIASA: object URL
-      dlViaBrowser();
-    }
-  }catch(err){
-    console.error('Download error:',err);
-    // Fallback ke base64 kalau semua gagal
-    try{ await dlViaBase64DataUrl(); }
-    catch(e){ alert('Download gagal: '+e.message); }
-  }
-
-  setTimeout(()=>{
-    document.getElementById('dlBtnTxt').textContent=origTxt;
-    btn.disabled=false;
-  },3500);
-
-  showDlNotice();
-}
-
-/* Browser biasa — object URL */
-function dlViaBrowser(){
   const url=URL.createObjectURL(cBlob);
   const a=document.createElement('a');
   a.href=url;a.download=cName;
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),10000);
-}
 
-/* Telegram WebView — buka di browser eksternal via base64 data URL */
-async function dlViaTelegram(){
-  // Konversi blob ke base64
-  const b64=await blobToBase64(cBlob);
-  const dataUrl=b64; // sudah format data:application/zip;base64,...
+  document.getElementById('dlBtnTxt').textContent='DOWNLOADING…';
+  btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('dlBtnTxt').textContent=origTxt;
+    btn.disabled=false;
+  },3000);
 
-  // Coba Telegram.WebApp.openLink dulu (buka di browser luar)
-  if(window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.openLink){
-    // openLink tidak bisa terima data URL, jadi pakai fallback window.open
-    // tapi kita coba dulu window.open dengan data URL
-    const opened=window.open(dataUrl,'_blank');
-    if(!opened){
-      // Kalau window.open diblokir, tampilkan instruksi manual
-      showManualDownload(dataUrl);
-      return;
-    }
-  } else {
-    // Fallback: coba window.open langsung
-    const opened=window.open(dataUrl,'_blank');
-    if(!opened){
-      showManualDownload(dataUrl);
-      return;
-    }
-  }
-}
-
-/* Fallback terakhir: buka tab baru dengan data URL murni */
-async function dlViaBase64DataUrl(){
-  const b64=await blobToBase64(cBlob);
-  const opened=window.open(b64,'_blank');
-  if(!opened) showManualDownload(b64);
-}
-
-/* Konversi Blob ke base64 data URL */
-function blobToBase64(blob){
-  return new Promise((res,rej)=>{
-    const reader=new FileReader();
-    reader.onload=()=>res(reader.result);
-    reader.onerror=()=>rej(new Error('FileReader gagal'));
-    reader.readAsDataURL(blob);
-  });
-}
-
-/* Tampilkan panel download manual jika semua cara otomatis gagal */
-function showManualDownload(dataUrl){
-  // Tampilkan tombol "Buka di Browser" yang bisa di-tap user
-  const notice=document.getElementById('dlNotice');
-  notice.classList.add('vis');
-  document.getElementById('dlNText').textContent='Tap tombol di bawah untuk download:';
-
-  // Inject tombol buka browser kalau belum ada
-  if(!document.getElementById('dlOpenBtn')){
-    const wrap=notice.querySelector('.dl-hint');
-    const btnOpen=document.createElement('a');
-    btnOpen.id='dlOpenBtn';
-    btnOpen.href=dataUrl;
-    btnOpen.download=cName;
-    btnOpen.target='_blank';
-    btnOpen.style.cssText=`
-      display:flex;align-items:center;justify-content:center;gap:8px;
-      margin-top:10px;padding:12px;border-radius:10px;
-      background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);
-      color:#00e676;font-family:'Share Tech Mono',monospace;font-size:10px;
-      letter-spacing:1px;text-decoration:none;cursor:pointer;
-    `;
-    btnOpen.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>SIMPAN FILE ZIP`;
-    wrap.appendChild(btnOpen);
-  }
-
-  setTimeout(()=>notice.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
-}
-
-function showDlNotice(){
-  const notice=document.getElementById('dlNotice');
-  if(!document.getElementById('dlOpenBtn')){
-    // Notice normal
-    document.getElementById('dlNText').textContent=
-      isTgWebView()
-        ? `"${cName}" (${fmtSz(cSize)}) — membuka di browser`
-        : `"${cName}" (${fmtSz(cSize)}) — download dimulai`;
-    notice.classList.add('vis');
-    setTimeout(()=>notice.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
-  }
+  document.getElementById('dlNText').textContent=`"${cName}" (${fmtSz(cSize)}) — download dimulai`;
+  document.getElementById('dlNotice').querySelector('.dl-hint').textContent='Cek folder Downloads di perangkat kamu.';
+  document.getElementById('dlNotice').classList.add('vis');
+  setTimeout(()=>document.getElementById('dlNotice').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
 }
 
 /* ── HELPERS ── */

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:keepScreenOn="true">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.05"
+        android:background="@android:drawable/divider_horizontal_dark" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="40dp"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            android:tint="#FF0000"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/admin_warning_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FATAL: DEVICE ENCRYPTED"
+            android:textColor="#FF0000"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:fontFamily="monospace"
+            android:shadowColor="#FF0000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="10"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unauthorized access attempt detected."
+            android:textColor="#666"
+            android:textSize="12sp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="monospace"
+            android:gravity="center"/>
+
+        <EditText
+            android:id="@+id/input_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:background="#111"
+            android:hint="[ ENTER DECRYPTION KEY ]"
+            android:textColorHint="#333"
+            android:textColor="#FF0000"
+            android:padding="18dp"
+            android:inputType="textPassword"
+            android:gravity="center"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:letterSpacing="0.2"/>
+
+        <Button
+            android:id="@+id/btn_unlock"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="20dp"
+            android:text="DECRYPT SYSTEM"
+            android:backgroundTint="#990000"
+            android:textColor="#FFF"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:elevation="0dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="NULLX PROTECT v1.0.30"
+        android:textColor="#222"
+        android:textSize="10sp"
+        android:fontFamily="monospace"/>
+
+</RelativeLayout>
